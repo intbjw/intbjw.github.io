@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iOS Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- Chrome, Firefox OS and Opera Status Bar Color -->
+<meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css">
+<link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.19.0/themes/prism.min.css">
+<link rel="stylesheet" type="text/css" href="css/SourceSansPro.css">
+<link rel="stylesheet" type="text/css" href="css/theme.css">
+<link rel="stylesheet" type="text/css" href="css/notablog.css">
+<!-- Favicon -->
+
+  <link rel="shortcut icon" href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;📖&lt;/text&gt;&lt;/svg&gt;">
+
+<style>
+  :root {
+    font-size: 20px;
+  }
+</style>
+  <title>逆向中常见的Hash算法和对称加密算法分&nbsp;|&nbsp;intBJW</title>
+  <meta property="og:type" content="blog">
+  <meta property="og:title" content="逆向中常见的Hash算法和对称加密算法分">
+  
+  
+    <meta property="og:image" content="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😅&lt;/text&gt;&lt;/svg&gt;">
+  
+  <style>
+    .DateTagBar {
+      margin-top: 1.0rem;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="Navbar">
+  <a href="index.html">
+    <div class="Navbar__Btn">
+      
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;📖&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+      
+      <span>Home</span>
+    </div>
+  </a>
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+  
+    
+      <span class="Navbar__Delim">&centerdot;</span>
+      <a href="about.html">
+        <div class="Navbar__Btn">
+          
+            <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😀&lt;/text&gt;&lt;/svg&gt;"></span>&nbsp;
+          
+          <span>About</span>
+        </div>
+      </a>
+    
+  
+    
+  
+    
+  
+    
+  
+</nav>
+  <header class="Header">
+    
+      <div class="Header__Cover">
+        <img src="https://www.notion.so/images/page-cover/gradients_5.png">
+      </div>
+    
+    <div class="Header__Spacer ">
+    </div>
+    
+      <div class="Header__Icon">
+        <span><img class="inline-img-icon" src="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;text text-anchor=%22middle%22 dominant-baseline=%22middle%22 x=%2250%22 y=%2255%22 font-size=%2280%22&gt;😅&lt;/text&gt;&lt;/svg&gt;"></span>
+      </div>
+    
+    <h1 class="Header__Title">逆向中常见的Hash算法和对称加密算法分</h1>
+    
+      <div class="DateTagBar">
+        
+          <span class="DateTagBar__Item DateTagBar__Date">Posted on Wed, Oct 30, 2024</span>
+        
+        
+          <span class="DateTagBar__Item DateTagBar__Tag DateTagBar__Tag--default">
+            <a href="tag/逆向.html">逆向</a>
+          </span>
+        
+      </div>
+    
+  </header>
+  <article id="https://www.notion.so/12fe7c086b3080088cf1e2c306f6e97a" class="PageRoot"><h1 id="https://www.notion.so/134e7c086b30806cae74f63f2ae0e445" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/134e7c086b30806cae74f63f2ae0e445"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">1 单向散列算法</span></span></h1><div id="https://www.notion.so/134e7c086b3080509ffbd9b19943481d" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">单向散列函数算法也称Hash（哈希）算法，是一种将任意长度的消息压缩到某一固定长度（消息摘要）的函数（该过程不可逆）。Hash函数可用于数字签名、消息的完整性检测、消息起源的认证检测等。常见的 散列算法有MD5、SHA、RIPE-MD、HAVAL、N-Hash等。</span></span></p></div><div id="https://www.notion.so/134e7c086b3080d38f48ed576799f56f" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在软件的加密保护中，Hash函数是经常用到的加密算法。但是，由于Hash函数为不可逆算法，所以 软件只能使用Hash函数作为一个加密的中间步骤。例如，对用户名做一个Hash变换，将这个结果再进行 一个可逆的加密变换（如对称密码），变换结果为注册码。从解密角度来说，一般不必了解Hash函数的 具体内容（变种算法除外），只要能识别出是何种Hash函数就可以了，然后直接套用相关算法源码实现。</span></span></p></div><h2 id="https://www.notion.so/134e7c086b3080c3ac34f85280449bac" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/134e7c086b3080c3ac34f85280449bac"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">1.1 MD5算法</span></span></h2><div id="https://www.notion.so/134e7c086b30806caaf3d34e354bb64c" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">MD5算法消息摘要算法对任意长度的消息进行运算，产生一个128位的消息摘要。近年来，随着穷举攻击和密码分析的发展，应用最为广泛的MD5算法已经不再那么流行了。</span></span></p></div><h3 id="https://www.notion.so/134e7c086b308047b566da655daaef40" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/134e7c086b308047b566da655daaef40"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">1.1.1 算法原理</span></span></h3><ol class="NumberedListWrapper"><li id="https://www.notion.so/134e7c086b30805baf79fd8a4483dee5" class="NumberedList" value="1"><span class="SemanticStringArray"><span class="SemanticString">数据填充</span></span><div id="https://www.notion.so/134e7c086b30809f9596e5004fe9853a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">填充消息使其长度与448模512同余（即长度=448 mod512）。也就是说，填充后的消息长度比512 的倍数仅小64位的数。即使消息长度本身已经满足上述长度要求，仍然需要填充。 填充方法是附一个1在消息后面，然后用0来进行填充，直到消息的长度与448模512同余。至少填 充1位，至多填充512位。</span></span></p></div></li><li id="https://www.notion.so/134e7c086b3080638eedceb61d178610" class="NumberedList" value="2"><span class="SemanticStringArray"><span class="SemanticString">添加长度</span></span><div id="https://www.notion.so/134e7c086b308031853dc122c1fdc4a6" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在第一步的结果之后附上64位的消息长度。如果填充前消息的长度大于24，贝 则只使用其低64位。 这时，在添加完填充位和消息长度之后，最终消息的长度正好就是512的整数倍了。 令M[0...N-1]表示最终的消息，其中N是16的倍数。</span></span></p></div></li><li id="https://www.notion.so/134e7c086b30806d9b34e40966082fe4" class="NumberedList" value="3"><span class="SemanticStringArray"><span class="SemanticString">初始化变量</span></span><div id="https://www.notion.so/134e7c086b3080cd85cfe1d6dbe15e67" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">用到4个变量 量（A，B,C,D）来计算消息摘要。这里A,B,C,D分别都是一个32位的寄存器。这些寄 存器以下面的十六进制数值来初始化：A=01234567h， B=89abcdefh, C=fedcba98h, D=76543210h。 并且在内存中是以低字节在前的形式来存储的，民 即如下格式：</span></span></p></div><div id="https://www.notion.so/134e7c086b308037b243ece758c56116" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">01 23 45 67 89 AB CD EF FE DC BA 86 76 54 32 10</strong></span></span></p></div></li><li id="https://www.notion.so/134e7c086b3080debd5dfd00fbe46166" class="NumberedList" value="4"><span class="SemanticStringArray"><span class="SemanticString">数据处理</span></span><div id="https://www.notion.so/134e7c086b3080adabc4dd913714f4e6" class="Image Image--PageWidth"><figure><a href="#"><img src="#" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div></li><li id="https://www.notion.so/134e7c086b3080cf9d90cb397157cf34" class="NumberedList" value="5"><span class="SemanticStringArray"><span class="SemanticString">输出</span></span><div id="https://www.notion.so/134e7c086b3080ef9be3c0f86cf11282" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">当所有的512位分组都运算完毕后，ABCD的级联将被输出为MD5散列的结果。以上是MD5算法的 简单描述，更 更为详细的实现程序， 请参考光盘中的源代码。</span></span></p></div></li></ol><h3 id="https://www.notion.so/134e7c086b308007a5eaf15be8b5e0ef" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--3"><a class="Anchor" href="#https://www.notion.so/134e7c086b308007a5eaf15be8b5e0ef"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">1.1.2 示例</span></span></h3><div id="https://www.notion.so/134e7c086b308054bab5d9635631e83b" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">使用加密与解密中的随书文件</span><span class="SemanticString"><strong class="SemanticString__Fragment SemanticString__Fragment--Bold">MD5KeyGenMe.exe</strong></span><span class="SemanticString">来分析</span></span></p></div><div id="https://www.notion.so/134e7c086b308098b2a3d14253084897" class="Image Image--PageWidth"><figure><a href="#"><img src="#" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/134e7c086b3080939918e16af913df68" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">打开程序发现需要输入两个text来进行验证，通过导入表中的**</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">GetDlgItemTextA</code></span><span class="SemanticString">**函数定位到关键代码</span></span></p></div><div id="https://www.notion.so/134e7c086b3080d8b035e603e9114d2d" class="Image Image--PageWidth"><figure><a href="#"><img src="#" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/134e7c086b308034905cc0b5ea17cd74" class="Image Image--PageWidth"><figure><a href="#"><img src="#" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/134e7c086b308008b046fcb8b93d284a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">sub_4010A0</code></span><span class="SemanticString"> 函数反编译后的代码</span></span></p></div><pre id="https://www.notion.so/134e7c086b30802093fcf0a34f5b54e4" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>int __cdecl sub_4010A0(HWND hDlg)
+{
+  UINT DlgItemTextA; // edi
+  int v2; // eax
+  int i; // eax
+  int v4; // ecx
+  CHAR String1[17]; // [esp+10h] [ebp-3C8h] BYREF
+  __int16 v7; // [esp+21h] [ebp-3B7h]
+  char v8; // [esp+23h] [ebp-3B5h]
+  CHAR v9[24]; // [esp+24h] [ebp-3B4h] BYREF
+  char v10[36]; // [esp+3Ch] [ebp-39Ch] BYREF
+  CHAR v11[197]; // [esp+60h] [ebp-378h] BYREF
+  __int16 v12; // [esp+125h] [ebp-2B3h]
+  char v13; // [esp+127h] [ebp-2B1h]
+  _DWORD v14[22]; // [esp+128h] [ebp-2B0h] BYREF
+  _BYTE v15[197]; // [esp+180h] [ebp-258h] BYREF
+  __int16 v16; // [esp+245h] [ebp-193h]
+  char v17; // [esp+247h] [ebp-191h]
+  CHAR String[197]; // [esp+248h] [ebp-190h] BYREF
+  __int16 v19; // [esp+30Dh] [ebp-CBh]
+  char v20; // [esp+30Fh] [ebp-C9h]
+  CHAR String2[197]; // [esp+310h] [ebp-C8h] BYREF
+  __int16 v22; // [esp+3D5h] [ebp-3h]
+  char v23; // [esp+3D7h] [ebp-1h]
+
+  memset(String, 0, sizeof(String));
+  memset(v15, 0, sizeof(v15));
+  v19 = 0;
+  v20 = 0;
+  memset(String2, 0, sizeof(String2));
+  v16 = 0;
+  v17 = 0;
+  memset(v11, 0, sizeof(v11));
+  v22 = 0;
+  v23 = 0;
+  v12 = 0;
+  v13 = 0;
+  qmemcpy(v9, aWwwPediyCom, 0x15u);
+  strcpy(v10, &quot;23456789ABCDEFGHJKLMNPQRSTUVWXYZ&quot;);
+  v7 = 0;
+  memset(String1, 0, sizeof(String1));
+  v8 = 0;
+  DlgItemTextA = GetDlgItemTextA(hDlg, 1000, String, 201);
+  if ( !DlgItemTextA )
+    goto LABEL_10;
+  if ( GetDlgItemTextA(hDlg, 1001, v11, 201) != 19 )
+    goto LABEL_10;
+  if ( v11[4] != 45 )
+    goto LABEL_10;
+  if ( v11[9] != 45 )
+    goto LABEL_10;
+  if ( v11[14] != 45 )
+    goto LABEL_10;
+  *(_DWORD *)&amp;String1[4] = *(_DWORD *)&amp;v11[5];
+  *(_DWORD *)String1 = *(_DWORD *)v11;
+  *(_DWORD *)&amp;String1[8] = *(_DWORD *)&amp;v11[10];
+  *(_DWORD *)&amp;String1[12] = *(_DWORD *)&amp;v11[15];
+  sub_4012B0(v14);
+  sub_4012E0(v14, String, DlgItemTextA);
+  v2 = lstrlenA(v9);
+  sub_4012E0(v14, v9, v2);
+  sub_401390(v15, v14);
+  for ( i = 0; i &lt; 16; String2[i - 1] = v10[v4] )
+    v4 = v15[i++] &amp; 0x1F;
+  if ( !lstrcmpA(String1, String2) )
+  {
+    SetDlgItemTextA(hDlg, 1001, ::String);
+    return 1;
+  }
+  else
+  {
+LABEL_10:
+    SetDlgItemTextA(hDlg, 1001, aWrongSerial);
+    return 0;
+  }
+}
+</span></span></span></code></pre><div id="https://www.notion.so/134e7c086b3080a1b891ec0231d02ca2" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">跟进函数</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">sub_4012B0</code></span><span class="SemanticString"> 发现MD5特征</span></span></p></div><pre id="https://www.notion.so/134e7c086b3080aca0b2e60aab681aef" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>_DWORD *__cdecl sub_4012B0(_DWORD *a1)
+{
+  _DWORD *result; // eax
+
+  result = a1;
+  a1[5] = 0;
+  a1[4] = 0;
+  *a1 = 0x67452301;
+  a1[1] = 0xEFCDAB89;
+  a1[2] = 0x98BADCFE;
+  a1[3] = 0x10325476;
+  return result;
+}
+</span></span></span></code></pre><div id="https://www.notion.so/134e7c086b3080ee8724dc68366fd69b" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">当然也可以直接使用插件判断算法</span></span></p></div><div id="https://www.notion.so/134e7c086b3080d685eec6a8a80c653c" class="Image Image--PageWidth"><figure><a href="#"><img src="#" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/134e7c086b3080c896aec1dd151a3cf9" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">分析代码</span></span></p></div><div id="https://www.notion.so/134e7c086b3080069d0ff17fedc8fb1b" class="Image Image--PageWidth"><figure><a href="#"><img src="#" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/134e7c086b308050b9acd13daff0c8bc" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">把name和pediy.com做一个拼接，然后在做一次变换得倒最终的序列号</span></span></p></div><div id="https://www.notion.so/134e7c086b308092b1e4ca7a9a2bad53" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">编写注册机</span></span></p></div><pre id="https://www.notion.so/134e7c086b308082ad8bdfbb20366fda" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>from hashlib import md5
+
+name = b&#x27;bjw&#x27;
+# 坑 这里不能用hex
+digest = md5(name + b&#x27;www.pediy.com&#x27;).digest()
+print(f&#x27;MD5({name})={digest.hex()}&#x27;)
+a2345 = &#x27;23456789ABCDEFGHJKLMNPQRSTUVWXYZ&#x27;
+serial_number = &#x27;&#x27;
+for b in digest:
+    serial_number += a2345[b &amp; 0x1F]
+print(f&#x27;Serial Number({name})={serial_number[0:4]}-{serial_number[4:8]}-{serial_number[8:12]}-{serial_number[12:16]}&#x27;)
+
+</span></span></span></code></pre><h2 id="https://www.notion.so/134e7c086b30804388e7f2c795c1e8c0" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/134e7c086b30804388e7f2c795c1e8c0"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">1.2 其他算法</span></span></h2><div id="https://www.notion.so/134e7c086b3080e2a236e6201c8ed82a" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">SHA算法特征值</span></span></p></div><div id="https://www.notion.so/134e7c086b3080c49d36dab70db2b668" class="Image Image--PageWidth"><figure><a href="#"><img src="#" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/134e7c086b3080cd8acff341ef22c2d8" class="Image Image--PageWidth"><figure><a href="#"><img src="#" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><h1 id="https://www.notion.so/134e7c086b308028be88f086ce064cbb" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--1"><a class="Anchor" href="#https://www.notion.so/134e7c086b308028be88f086ce064cbb"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">2 对称加密算法</span></span></h1><div id="https://www.notion.so/134e7c086b30809ca9a0deafc8800049" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">常见的对称分组加密算法有 DES(Data EncryptionStandard)、IDEA（Intemational 1Data Encryption Algorithm）、AES（AdvancedEncryptionStandard）、BlowFish、Twofish等。本节将以常见的对称加密算法TEA、IDEA、BlowFish、AES及流密码RC4为例，介绍对称算法在软件保护中的应用。感兴趣的读者可 以进一步阅读密码学相关书籍，如《对称密码学》（机械工业出版社）来了解更多的关于对称密码的知识。</span></span></p></div><h2 id="https://www.notion.so/134e7c086b3080dc92f3f1d97ad60c33" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/134e7c086b3080dc92f3f1d97ad60c33"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">2.1 RC4流密码</span></span></h2><div id="https://www.notion.so/134e7c086b308000a260cf755d8ad9d2" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">RC4生成一种称为密钥流的伪随机流，它同明文通过异或操作相混合以达到加密的目的，解密时，同密文进行异或操作。其密钥流的生成由两部分组成：KSA和PRGA。</span></span></p></div><div id="https://www.notion.so/134e7c086b3080a880c6c0794c6249c8" class="Image Image--PageWidth"><figure><a href="#"><img src="#" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/134e7c086b308092ad0df4281b2ebe32" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">(1） KSA ( the Key-Scheduling Algorithn )</span></span></p></div><div id="https://www.notion.so/134e7c086b30806d8480f193d3ca77e8" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">RC4 首先使用密钥调度算法（KSA）完成对大小为 256字节的数组S的初始化及替换，在替 换时使用密钥。其密钥的长度一般取 5～16 字节，即 40～128 位，也可以更长，通常不超过 256 位。先用0～255初始化数组S，然后使用密钥进行替换，伪代码如下。</span></span></p></div><pre id="https://www.notion.so/134e7c086b30803da649d7147b15a03f" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>for i=0 to 255 do
+  S[i]:=i;
+j:=0;
+
+for i=0 to 255 do
+  j:=(j+S[i]+key[i mod keylength]) mod 256; //重复使用密钥
+  Swap(s[i],S[j]); //交换s[i]与s[j]
+</span></span></span></code></pre><div id="https://www.notion.so/134e7c086b308098ab34ce0a9c03b9f9" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">(2） PRGA( the Pseudo-Random Generation Algorithm) 数组S在完成初始化之后，便不再使用输人的密钥。密钥流的生成是从ST0]到ST255]的。对每 个S[]，根据当前S的值，将S[]与S中的另一字节置换。在S[255]完成转换后，操作仍重复执行。 伪代码如下。</span></span></p></div><pre id="https://www.notion.so/134e7c086b308022ad44fd86d4462eac" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>i,j=0;
+while(明文未结束)
+  i=(i+1）mod 256;
+  j=（j+S[i]）mod256;
+  Swap(s[i],S[j]);
+  t=(S[i]+S[j]）mod256;
+  k=S[t];
+</span></span></span></code></pre><div id="https://www.notion.so/134e7c086b3080da849be07937d634b8" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">得到的子密码k用于和明文进行XOR运算，得到密文。解密过程也完全相同。由于RC4算法 在加密时采用的是XOR运算，一旦子密钥序列出现了重复，密文就有可能被破解。因此，在使用 RC4算法时，必须对加密密钥进行测试，以判断其是否为弱密钥。</span></span></p></div><h2 id="https://www.notion.so/134e7c086b3080389f4bcfe6c4d0fe86" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/134e7c086b3080389f4bcfe6c4d0fe86"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">2.2 TEA算法</span></span></h2><div id="https://www.notion.so/134e7c086b308048a891d27bd7216ff7" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">TEA是分组密码，分组长度为64位，密钥长度为128位，采用Feistel网络。</span></span></p></div><div id="https://www.notion.so/134e7c086b3080138ad1fd533530ab57" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">其加密过程也比较简单。</span></span></p></div><div id="https://www.notion.so/134e7c086b30802aae32d000697d3d6e" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">算法的特征为</span><span class="SemanticString"><code class="SemanticString__Fragment SemanticString__Fragment--Code">delta = 0x9E377989</code></span><span class="SemanticString">，这个常量是由黄金分割点得来的。TEA的变种算法也常用到这个变量，但是加密过程不同。</span></span></p></div><div id="https://www.notion.so/134e7c086b30809ca346e51e50085540" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">在加密轮数方面，作者推荐的加密轮数是64轮，即循环32次，也可以采用其他加密轮数，比如32轮或者128轮，在分析的时候也需要注意。</span></span></p></div><div id="https://www.notion.so/134e7c086b308005bd8cdb3d4e9bed30" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">如下图：</span></span></p></div><div id="https://www.notion.so/134e7c086b3080269a99cf30b84c3d10" class="Image Image--PageWidth"><figure><a href="#"><img src="#" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><h2 id="https://www.notion.so/134e7c086b3080e08c93fd764bf3714f" class="ColorfulBlock ColorfulBlock--ColorDefault Heading Heading--2"><a class="Anchor" href="#https://www.notion.so/134e7c086b3080e08c93fd764bf3714f"><svg width="16" height="16" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a><span class="SemanticStringArray"><span class="SemanticString">2.3 SM4国密算法</span></span></h2><div id="https://www.notion.so/134e7c086b308072877ad8c421df1e57" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">SM4是一个分组算法，分组长度为128比特，密钥成都为128比特其结构是Fesitel网络的一个变体。</span></span></p></div><div id="https://www.notion.so/134e7c086b3080e48359e476dc3dfda8" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"><span class="SemanticString">SM4的特征为S-box</span></span></p></div><pre id="https://www.notion.so/134e7c086b3080c7bc85eeec80fe4110" class="Code"><code><span class="SemanticStringArray"><span class="SemanticString"><span>static const unsigned char SboxTable[16][16] =
+{
+{0xd6,0x90,0xe9,0xfe,0xcc,0xe1,0x3d,0xb7,0x16,0xb6,0x14,0xc2,0x28,0xfb,0x2c,0x05},
+{0x2b,0x67,0x9a,0x76,0x2a,0xbe,0x04,0xc3,0xaa,0x44,0x13,0x26,0x49,0x86,0x06,0x99},
+{0x9c,0x42,0x50,0xf4,0x91,0xef,0x98,0x7a,0x33,0x54,0x0b,0x43,0xed,0xcf,0xac,0x62},
+{0xe4,0xb3,0x1c,0xa9,0xc9,0x08,0xe8,0x95,0x80,0xdf,0x94,0xfa,0x75,0x8f,0x3f,0xa6},
+{0x47,0x07,0xa7,0xfc,0xf3,0x73,0x17,0xba,0x83,0x59,0x3c,0x19,0xe6,0x85,0x4f,0xa8},
+{0x68,0x6b,0x81,0xb2,0x71,0x64,0xda,0x8b,0xf8,0xeb,0x0f,0x4b,0x70,0x56,0x9d,0x35},
+{0x1e,0x24,0x0e,0x5e,0x63,0x58,0xd1,0xa2,0x25,0x22,0x7c,0x3b,0x01,0x21,0x78,0x87},
+{0xd4,0x00,0x46,0x57,0x9f,0xd3,0x27,0x52,0x4c,0x36,0x02,0xe7,0xa0,0xc4,0xc8,0x9e},
+{0xea,0xbf,0x8a,0xd2,0x40,0xc7,0x38,0xb5,0xa3,0xf7,0xf2,0xce,0xf9,0x61,0x15,0xa1},
+{0xe0,0xae,0x5d,0xa4,0x9b,0x34,0x1a,0x55,0xad,0x93,0x32,0x30,0xf5,0x8c,0xb1,0xe3},
+{0x1d,0xf6,0xe2,0x2e,0x82,0x66,0xca,0x60,0xc0,0x29,0x23,0xab,0x0d,0x53,0x4e,0x6f},
+{0xd5,0xdb,0x37,0x45,0xde,0xfd,0x8e,0x2f,0x03,0xff,0x6a,0x72,0x6d,0x6c,0x5b,0x51},
+{0x8d,0x1b,0xaf,0x92,0xbb,0xdd,0xbc,0x7f,0x11,0xd9,0x5c,0x41,0x1f,0x10,0x5a,0xd8},
+{0x0a,0xc1,0x31,0x88,0xa5,0xcd,0x7b,0xbd,0x2d,0x74,0xd0,0x12,0xb8,0xe5,0xb4,0xb0},
+{0x89,0x69,0x97,0x4a,0x0c,0x96,0x77,0x7e,0x65,0xb9,0xf1,0x09,0xc5,0x6e,0xc6,0x84},
+{0x18,0xf0,0x7d,0xec,0x3a,0xdc,0x4d,0x20,0x79,0xee,0x5f,0x3e,0xd7,0xcb,0x39,0x48}
+};
+
+</span></span></span></code></pre><div id="https://www.notion.so/134e7c086b30803f9d1ec5e30cef160b" class="Image Image--PageWidth"><figure><a href="#"><img src="#" style="width:100%"/></a><figcaption><span class="SemanticStringArray"></span></figcaption></figure></div><div id="https://www.notion.so/134e7c086b30805eb035cbe0688004d1" class="ColorfulBlock ColorfulBlock--ColorDefault Text"><p class="Text__Content"><span class="SemanticStringArray"></span></p></div></article>
+  <footer class="Footer">
+  <div>&copy; intBJW 2024</div>
+  <div>&centerdot;</div>
+  <div>Powered by <a href="https://github.com/dragonman225/notablog" target="_blank"
+      rel="noopener noreferrer">Notablog</a>.
+  </div>
+</footer>
+
+</body>
+
+</html>
