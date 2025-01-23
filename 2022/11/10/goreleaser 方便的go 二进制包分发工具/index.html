@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="安装使用bash脚本进行安装 1curl -sfL https:&#x2F;&#x2F;goreleaser.com&#x2F;static&#x2F;run | bash  简单使用go语言是支持跨平台编译的，每次编译发布都手动操作太麻烦了，使用本工具可以在一次配置好后，每次发布时只要一条命令就可以编译发布了。 首先我们创建一个测试项目，然后编写一个main.go文件 123456&#x2F;&#x2F; main.gopackage mainfunc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="goreleaser 方便的go 二进制包分发工具">
+<meta property="og:url" content="https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:site_name" content="intBJW&#39;s blog">
+<meta property="og:description" content="安装使用bash脚本进行安装 1curl -sfL https:&#x2F;&#x2F;goreleaser.com&#x2F;static&#x2F;run | bash  简单使用go语言是支持跨平台编译的，每次编译发布都手动操作太麻烦了，使用本工具可以在一次配置好后，每次发布时只要一条命令就可以编译发布了。 首先我们创建一个测试项目，然后编写一个main.go文件 123456&#x2F;&#x2F; main.gopackage mainfunc">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://intbjw.github.io/imgs/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7%20ce4effd525964ad489ac61519a128673/Untitled.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7%20ce4effd525964ad489ac61519a128673/Untitled%201.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7%20ce4effd525964ad489ac61519a128673/Untitled%202.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7%20ce4effd525964ad489ac61519a128673/Untitled%203.png">
+<meta property="article:published_time" content="2022-11-10T04:18:02.000Z">
+<meta property="article:modified_time" content="2025-01-23T07:09:10.552Z">
+<meta property="article:author" content="intBJW">
+<meta property="article:tag" content="开发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://intbjw.github.io/imgs/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7%20ce4effd525964ad489ac61519a128673/Untitled.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>goreleaser 方便的go 二进制包分发工具</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="intBJW&#39;s blog" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/intbjw">项目</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2023/01/13/docker%E5%AD%A6%E4%B9%A0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2022/08/17/JS%20Debug/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&text=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&title=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&is_video=false&description=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=goreleaser 方便的go 二进制包分发工具&body=Check out this article: https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&title=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&title=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&title=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&title=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&name=goreleaser 方便的go 二进制包分发工具&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&t=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-number">1.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="toc-number">2.</span> <span class="toc-text">简单使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E5%85%88%E8%B7%91%E4%B8%80%E4%B8%8B"><span class="toc-number">3.</span> <span class="toc-text">事先跑一下</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">4.</span> <span class="toc-text">常见的使用场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E6%95%88%E6%9E%9C"><span class="toc-number">5.</span> <span class="toc-text">最后效果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E5%90%88Action%E4%BD%BF%E7%94%A8"><span class="toc-number">6.</span> <span class="toc-text">配合Action使用</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        goreleaser 方便的go 二进制包分发工具
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">intBJW</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-11-10T04:18:02.000Z" class="dt-published" itemprop="datePublished">2022-11-10</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E5%BC%80%E5%8F%91/" rel="tag">开发</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>使用bash脚本进行安装</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -sfL https://goreleaser.com/static/run | bash</span><br></pre></td></tr></table></figure>
+
+<h2 id="简单使用"><a href="#简单使用" class="headerlink" title="简单使用"></a>简单使用</h2><p>go语言是支持跨平台编译的，每次编译发布都手动操作太麻烦了，使用本工具可以在一次配置好后，每次发布时只要一条命令就可以编译发布了。</p>
+<p>首先我们创建一个测试项目，然后编写一个main.go文件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// main.go</span><br><span class="line">package main</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">  println(<span class="string">&quot;hello kaka&quot;</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>初始化模块</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go mod init main</span><br></pre></td></tr></table></figure>
+
+<p>运行<a target="_blank" rel="noopener" href="https://goreleaser.com/cmd/goreleaser_init/">init</a>命令以创建示例<code>.goreleaser.yaml</code> 以及<code>.gitignore</code>文件：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goreleaser init</span><br></pre></td></tr></table></figure>
+
+<p>其中<code>.goreleaser.yaml</code> 是goreleaser发布相关配置，<code>.gitignore</code> 是设置git忽略的文件夹或文件</p>
+<p>.goreleaser.yaml</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## This is an example .goreleaser.yml file with some sensible defaults.</span></span><br><span class="line"><span class="comment">## Make sure to check the documentation at https://goreleaser.com</span></span><br><span class="line"><span class="attr">before:</span></span><br><span class="line">  <span class="attr">hooks:</span></span><br><span class="line">    <span class="comment">## You may remove this if you don&#x27;t use go modules.</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">go</span> <span class="string">mod</span> <span class="string">tidy</span></span><br><span class="line">    <span class="comment">## you may remove this if you don&#x27;t need go generate</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">go</span> <span class="string">generate</span> <span class="string">./...</span></span><br><span class="line"><span class="attr">builds:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">env:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">CGO_ENABLED=0</span></span><br><span class="line">    <span class="attr">goos:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">linux</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">windows</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">darwin</span></span><br><span class="line"><span class="attr">archives:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">replacements:</span></span><br><span class="line">      <span class="attr">darwin:</span> <span class="string">Darwin</span></span><br><span class="line">      <span class="attr">linux:</span> <span class="string">Linux</span></span><br><span class="line">      <span class="attr">windows:</span> <span class="string">Windows</span></span><br><span class="line">      <span class="attr">386:</span> <span class="string">i386</span></span><br><span class="line">      <span class="attr">amd64:</span> <span class="string">x86_64</span></span><br><span class="line"><span class="attr">checksum:</span></span><br><span class="line">  <span class="attr">name_template:</span> <span class="string">&#x27;checksums.txt&#x27;</span></span><br><span class="line"><span class="attr">snapshot:</span></span><br><span class="line">  <span class="attr">name_template:</span> <span class="string">&quot;<span class="template-variable">&#123;&#123; incpatch .Version &#125;&#125;</span>-next&quot;</span></span><br><span class="line"><span class="attr">changelog:</span></span><br><span class="line">  <span class="attr">sort:</span> <span class="string">asc</span></span><br><span class="line">  <span class="attr">filters:</span></span><br><span class="line">    <span class="attr">exclude:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&#x27;^docs:&#x27;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&#x27;^test:&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## modelines, feel free to remove those if you don&#x27;t want/use them:</span></span><br><span class="line"><span class="comment">## yaml-language-server: $schema=https://goreleaser.com/static/schema.json</span></span><br><span class="line"><span class="comment">## vim: set ts=2 sw=2 tw=0 fo=cnqoj</span></span><br></pre></td></tr></table></figure>
+
+<p>.gitignore</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">dist/</span></span><br><span class="line"><span class="string">.idea/</span></span><br></pre></td></tr></table></figure>
+
+<p>如果是在本地生成release，使用下面的命令即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goreleaser release --snapshot --rm-dist</span><br></pre></td></tr></table></figure>
+
+<p>可以自定义.goreleaser.yaml ，并且使用命令去检查你的配置文件是否有错误</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goreleaser check</span><br></pre></td></tr></table></figure>
+
+<p>也可以只从生成本地开发环境对应的release，例如在macos上使用此命令，只会生成macos版本的二进制文件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goreleaser build --single-target</span><br></pre></td></tr></table></figure>
+
+<h2 id="事先跑一下"><a href="#事先跑一下" class="headerlink" title="事先跑一下"></a>事先跑一下</h2><p>如果你想在真正发布以前测试下你的程序，可是使用以下的方法</p>
+<p>只编译项目</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">goreleaser build</span><br></pre></td></tr></table></figure>
+
+<p>如果当前存在dist目录，可以手动删除dist，或者在命令中加入<code>—rm-dist</code>参数</p>
+<p><img src="/../imgs/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7%20ce4effd525964ad489ac61519a128673/Untitled.png" alt="Untitled"></p>
+<p>编译结果</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">☁  action [main] tree </span><br><span class="line">.</span><br><span class="line">├── README.md</span><br><span class="line">├── dist</span><br><span class="line">│   ├── CHANGELOG.md</span><br><span class="line">│   ├── action_darwin_amd64_v1</span><br><span class="line">│   │   └── action</span><br><span class="line">│   ├── action_darwin_arm64</span><br><span class="line">│   │   └── action</span><br><span class="line">│   ├── action_linux_386</span><br><span class="line">│   │   └── action</span><br><span class="line">│   ├── action_linux_amd64_v1</span><br><span class="line">│   │   └── action</span><br><span class="line">│   ├── action_linux_arm64</span><br><span class="line">│   │   └── action</span><br><span class="line">│   ├── action_windows_386</span><br><span class="line">│   │   └── action.exe</span><br><span class="line">│   ├── action_windows_amd64_v1</span><br><span class="line">│   │   └── action.exe</span><br><span class="line">│   ├── action_windows_arm64</span><br><span class="line">│   │   └── action.exe</span><br><span class="line">│   ├── artifacts.json</span><br><span class="line">│   ├── config.yaml</span><br><span class="line">│   └── metadata.json</span><br><span class="line">├── go.mod</span><br><span class="line">└── main.go</span><br></pre></td></tr></table></figure>
+
+<h2 id="常见的使用场景"><a href="#常见的使用场景" class="headerlink" title="常见的使用场景"></a>常见的使用场景</h2><p>在修完bug后，测试并发布到release中</p>
+<p>在commit代码并push后可以在IDE中，右键把这条打一个标签</p>
+<p><img src="/../imgs/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7%20ce4effd525964ad489ac61519a128673/Untitled%201.png" alt="Untitled"></p>
+<p><img src="/../imgs/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7%20ce4effd525964ad489ac61519a128673/Untitled%202.png" alt="Untitled"></p>
+<p>最后使用命令进行发布</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">goreleaser</span> <span class="string">release</span> <span class="string">--rm-dist</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="最后效果"><a href="#最后效果" class="headerlink" title="最后效果"></a>最后效果</h2><p>发布并且会有更新日志，不同系统不同架构程序都会打包📦出来</p>
+<p><img src="/../imgs/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7%20ce4effd525964ad489ac61519a128673/Untitled%203.png" alt="Untitled"></p>
+<h2 id="配合Action使用"><a href="#配合Action使用" class="headerlink" title="配合Action使用"></a>配合Action使用</h2>
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/intbjw">项目</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-number">1.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8"><span class="toc-number">2.</span> <span class="toc-text">简单使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E5%85%88%E8%B7%91%E4%B8%80%E4%B8%8B"><span class="toc-number">3.</span> <span class="toc-text">事先跑一下</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">4.</span> <span class="toc-text">常见的使用场景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E%E6%95%88%E6%9E%9C"><span class="toc-number">5.</span> <span class="toc-text">最后效果</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E5%90%88Action%E4%BD%BF%E7%94%A8"><span class="toc-number">6.</span> <span class="toc-text">配合Action使用</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&text=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&title=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&is_video=false&description=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=goreleaser 方便的go 二进制包分发工具&body=Check out this article: https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&title=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&title=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&title=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&title=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&name=goreleaser 方便的go 二进制包分发工具&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://intbjw.github.io/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/&t=goreleaser 方便的go 二进制包分发工具"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2020-2025
+    intBJW
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/intbjw">项目</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+  <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?0ae94ec1b308edd27e5393ae9c49cd4e";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+        </script>
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'intbjw/intbjw.github.io';
+      var utterances_issue_term = 'pathname';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-dark';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+</body>
+</html>

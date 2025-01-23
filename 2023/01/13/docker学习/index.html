@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="数据挂载docker提供两种将数据从宿主机挂载到容器中：  volumes:将docker的文件系统挂载到&#x2F;var&#x2F;lib&#x2F;docker&#x2F;volumes bind mounts:将宿主机上的任意位置的文件或目录挂载到容器中  volumes示例： 创建数据卷  123docker volume create nginx-voldocker volume lsdocker volume inspec">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker学习">
+<meta property="og:url" content="https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="intBJW&#39;s blog">
+<meta property="og:description" content="数据挂载docker提供两种将数据从宿主机挂载到容器中：  volumes:将docker的文件系统挂载到&#x2F;var&#x2F;lib&#x2F;docker&#x2F;volumes bind mounts:将宿主机上的任意位置的文件或目录挂载到容器中  volumes示例： 创建数据卷  123docker volume create nginx-voldocker volume lsdocker volume inspec">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-01-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-01-23T06:48:06.397Z">
+<meta property="article:author" content="intBJW">
+<meta property="article:tag" content="云原生">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>docker学习</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="intBJW&#39;s blog" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/intbjw">项目</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2023/02/19/Vue%E5%85%A5%E9%97%A8/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&text=docker学习"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&title=docker学习"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&is_video=false&description=docker学习"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=docker学习&body=Check out this article: https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&title=docker学习"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&title=docker学习"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&title=docker学习"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&title=docker学习"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&name=docker学习&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&t=docker学习"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%8C%82%E8%BD%BD"><span class="toc-number">1.</span> <span class="toc-text">数据挂载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#volumes%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="toc-number">1.0.1.</span> <span class="toc-text">volumes示例：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bind-mount%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="toc-number">1.0.2.</span> <span class="toc-text">bind mount示例：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#DockerFile"><span class="toc-number">2.</span> <span class="toc-text">DockerFile</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker-Compose%E4%BD%BF%E7%94%A8"><span class="toc-number">3.</span> <span class="toc-text">Docker Compose使用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BARedis"><span class="toc-number">4.</span> <span class="toc-text">使用Docker搭建Redis</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BAMongo"><span class="toc-number">5.</span> <span class="toc-text">使用Docker搭建Mongo</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8Docker%E9%83%A8%E7%BD%B2Tomcat"><span class="toc-number">5.1.</span> <span class="toc-text">使用Docker部署Tomcat</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%89%E8%A3%85docker-compose"><span class="toc-number">6.</span> <span class="toc-text">安装docker-compose</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#docker%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6"><span class="toc-number">7.</span> <span class="toc-text">docker资源限制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95%EF%BC%9A"><span class="toc-number">7.1.</span> <span class="toc-text">踩坑记录：</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="toc-number">8.</span> <span class="toc-text">最佳实践</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        docker学习
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">intBJW</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-01-12T16:00:00.000Z" class="dt-published" itemprop="datePublished">2023-01-13</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E4%BA%91%E5%8E%9F%E7%94%9F/" rel="tag">云原生</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h1 id="数据挂载"><a href="#数据挂载" class="headerlink" title="数据挂载"></a>数据挂载</h1><p>docker提供两种将数据从宿主机挂载到容器中：</p>
+<ul>
+<li>volumes:将docker的文件系统挂载到<code>/var/lib/docker/volumes</code></li>
+<li>bind mounts:将宿主机上的任意位置的文件或目录挂载到容器中</li>
+</ul>
+<h3 id="volumes示例："><a href="#volumes示例：" class="headerlink" title="volumes示例："></a>volumes示例：</h3><ol>
+<li><p>创建数据卷</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker volume create nginx-vol</span><br><span class="line">docker volume <span class="built_in">ls</span></span><br><span class="line">docker volume inspect nginx-vol</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用数据卷</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name=nginx-test --mount src=nginx-vol,dst=/usr/share/nginx/html nginx</span><br><span class="line">docekr run -d --name=nginx-test -v nginx-vol:/usr/share/nginx/html nginx</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="bind-mount示例："><a href="#bind-mount示例：" class="headerlink" title="bind mount示例："></a>bind mount示例：</h3><ol>
+<li><p>挂载宿主机目录到容器</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name=nginx-test --mount <span class="built_in">type</span>=<span class="built_in">bind</span>,src</span><br><span class="line">docker volume <span class="built_in">ls</span></span><br><span class="line">docker volume inspect nginx-vol</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>使用数据卷</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name=nginx-test --mount src=nginx-vol,dst=/usr/share/nginx/html nginx</span><br><span class="line">docekr run -d --name=nginx-test -v nginx-vol:/usr/share/nginx/html nginx</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h1 id="DockerFile"><a href="#DockerFile" class="headerlink" title="DockerFile"></a>DockerFile</h1><p>常使用的指令</p>
+<figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 设置基础镜像</span></span><br><span class="line">FORM</span><br><span class="line"><span class="comment"># 设置基础镜像</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># RUN有两个格式</span></span></span><br><span class="line"><span class="comment"># RUN &lt;command&gt; (shell 格式，linux默认使用/bin/sh windows默认使用cmd /S /C)</span></span><br><span class="line"><span class="comment"># RUN /bin/bash -c &#x27;echo WJLab&#x27;</span></span><br><span class="line"><span class="comment"># RUN [&quot;executable&quot;,&quot;param1&quot;,&quot;param2&quot;]</span></span><br><span class="line"><span class="comment"># RUN [&quot;/bin/bash&quot;, &quot;-c&quot;, &quot;echo WJLab&quot;]</span></span><br><span class="line"><span class="comment"># Windows命令 需要多反斜杠进行转义</span></span><br><span class="line"><span class="comment"># RUN [&quot;c:\\windows\\system32\\tasklist.exe&quot;]</span></span><br><span class="line"><span class="keyword">CMD</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># 每个dockerfile文件中只能有一个CMD指令</span></span></span><br><span class="line"><span class="comment"># 当存在多个CMD时，只有最后一个会生效</span></span><br><span class="line"><span class="comment"># CMD command param1 param2 (shell 格式)</span></span><br><span class="line"><span class="comment"># CMD [&quot;executable&quot;,&quot;param1&quot;,&quot;param2&quot;] (exec格式, 推荐格式)</span></span><br><span class="line"><span class="comment"># CMD [&quot;param1&quot;,&quot;param2&quot;] </span></span><br><span class="line"><span class="comment"># 参数必须使用双引号</span></span><br><span class="line"><span class="keyword">LABEL</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># LABEL &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; &lt;key&gt;=&lt;value&gt; ...</span></span></span><br><span class="line"><span class="keyword">EXPOSE</span></span><br><span class="line"><span class="comment"># EXPOSE &lt;port&gt; [&lt;port&gt;/&lt;protocol&gt;...]</span></span><br><span class="line"><span class="comment"># 设置容器指定监听地址</span></span><br><span class="line"><span class="keyword">ENV</span></span><br><span class="line"><span class="comment"># 设置环境变量</span></span><br><span class="line"><span class="comment"># ENV MY_CAT=fluffy</span></span><br><span class="line"><span class="keyword">ADD</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># 设置添加文件所属用户</span></span></span><br><span class="line"><span class="comment"># ADD [--chown=&lt;user&gt;:&lt;group&gt;] [&quot;&lt;src&gt;&quot;,... &quot;&lt;dest&gt;&quot;]</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># COPY [--chown=&lt;user&gt;:&lt;group&gt;] [&quot;&lt;src&gt;&quot;,... &quot;&lt;dest&gt;&quot;]</span></span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># 和CMD一样也有两种格式，容器启动后执行的命令</span></span></span><br><span class="line"><span class="comment"># ENTRYPOINT [&quot;executable&quot;, &quot;param1&quot;, &quot;param2&quot;]</span></span><br><span class="line"><span class="comment"># ENTRYPOINT command param1 param2</span></span><br><span class="line">VLOUME</span><br><span class="line"><span class="comment"># 磁盘挂载</span></span><br><span class="line"><span class="keyword">USER</span></span><br><span class="line"><span class="comment"># 设置容器内启动用户</span></span><br><span class="line"><span class="comment"># USER &lt;user&gt;[:&lt;group&gt;] </span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># WORKDIR指令为Dockerfile中跟随它的任何RUN、CMD、ENTRYPOINT、COPY和ADD指令设置工作目录</span></span></span><br><span class="line"><span class="comment"># WORKDIR/path/to/workdir</span></span><br><span class="line"><span class="keyword">SHELL</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># 设置Shell</span></span></span><br></pre></td></tr></table></figure>
+
+<h1 id="Docker-Compose使用"><a href="#Docker-Compose使用" class="headerlink" title="Docker Compose使用"></a>Docker Compose使用</h1><p>Docker Compose使用YAML文件来定义多服务的应用。YAML是JSON的一个子集。</p>
+<p>Docker Compose默认使用文件名docker-compose.yml，用户也可以使用-f参数指定具体文件。</p>
+<p>Compose文件示例：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用Compose文件部署一个小型Flask应用</span></span><br><span class="line"><span class="comment"># 文件的基本结构包含四个一级Key: version、services、networks、volumes</span></span><br><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3.5&#x27;</span> <span class="comment"># 必须指定，定义了Compose文件格式(主要是API)，并非是docker等软件版本，也不是镜像版本</span></span><br><span class="line"><span class="attr">services:</span> <span class="comment"># 定义不同的应用服务，并使用对应key去创建容器</span></span><br><span class="line">  <span class="attr">web-fe:</span> <span class="comment"># web前端服务</span></span><br><span class="line">    <span class="attr">build:</span> <span class="string">../../../../Downloads/2ca795e5-bcc5-454b-b86b-66d898441190_Export-7e8b8b0a-9a64-4e0c-a809-9be4e17806bb/intBJW</span> <span class="string">5474d6448d824f288be5e0ee64b225e2</span> <span class="comment"># 指定Docker基于当前目录(.)下的Dockerfile中的定义指令来构建一个新镜像，这个镜像会被用于启动该服务的容器</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">python</span> <span class="string">app.py</span> <span class="comment"># 指定Docker容器中名为app.py的Python脚本作为主程序吗，当然，此镜像中必须包括app.py文件以及Python(Dockerfile) 可以覆盖Dockerfile中的CMD命令</span></span><br><span class="line">    <span class="attr">ports:</span> <span class="comment"># 定义端口</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">target:</span> <span class="number">5000</span> <span class="comment"># 容器内端口</span></span><br><span class="line">        <span class="attr">published:</span> <span class="number">5000</span> <span class="comment"># 发布端口=宿主机端口</span></span><br><span class="line">    <span class="attr">networks:</span> <span class="comment"># 将web连接到指定的网络上</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">counter-net</span></span><br><span class="line">    <span class="attr">volumes:</span> <span class="comment"># 指定数据卷 </span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">type:</span> <span class="string">volume</span> <span class="comment"># 数据卷类型</span></span><br><span class="line">        <span class="attr">source:</span> <span class="string">counter-volume</span> <span class="comment"># 数据卷(宿主机)</span></span><br><span class="line">        <span class="attr">target:</span> <span class="string">/code</span> <span class="comment"># 容器内路径</span></span><br><span class="line">  <span class="attr">redis:</span> <span class="comment"># redis服务</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">&quot;redis:alpine&quot;</span> <span class="comment"># 指定镜像，该镜像会从Docker Hub中拉取下来</span></span><br><span class="line">    <span class="attr">networks:</span> <span class="comment"># 将redis连接到指定网络上</span></span><br><span class="line">      <span class="attr">counter-net:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">networks:</span> <span class="comment"># 用于指引Docker创建新的网络</span></span><br><span class="line">  <span class="attr">counter-net:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">volumes:</span> <span class="comment"># 用于指引Docker创建新的数据卷</span></span><br><span class="line">  <span class="attr">counter-vol:</span></span><br></pre></td></tr></table></figure>
+
+<p>使用docker-compose部署应用</p>
+<p>文件目录：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">ubuntu@ubuntu:~/docker/counter-app-master$</span> <span class="string">ls</span></span><br><span class="line"><span class="string">app.py</span>  <span class="string">docker-compose.yml</span>  <span class="string">Dockerfile</span>  <span class="string">README.md</span>  <span class="string">requirements.txt</span></span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li><a target="_blank" rel="noopener" href="http://app.py/">app.py</a> 应用程序代码</li>
+<li>docker-compose.yml是Compose文件，定义docker服务怎么部署应用</li>
+<li>Dockerfile定义如何构建web-fe服务所使用的镜像</li>
+<li>requirements.txt 列出了应用所依赖的Python包</li>
+</ul>
+<p>部署中出现的问题：</p>
+<p>使用pip安装python库时出现网络问题，安装报错</p>
+<p>删除<code>/etc/docker/daemon.json</code> 后安装成功</p>
+<p>构建springboot镜像的Dockerfile示例：</p>
+<figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> openjdk:<span class="number">8</span></span><br><span class="line"><span class="keyword">MAINTAINER</span> intbjw</span><br><span class="line"><span class="keyword">ADD</span><span class="language-bash"> ./target/dockerdemo-0.0.1-SNAPSHOT.jar app.jar</span></span><br><span class="line"><span class="keyword">VOLUME</span><span class="language-bash"> /code</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8080</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> bash -c <span class="string">&#x27;touch /app.jar&#x27;</span></span></span><br><span class="line"><span class="comment"># 用于设定容器启动时第一个运行的命令及器参数</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="string">&quot;java&quot;</span>,<span class="string">&quot;-Djava.security.egd=file:/dev/./urandom&quot;</span>,<span class="string">&quot;-jar&quot;</span>,<span class="string">&quot;/app.jar&quot;</span>]</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>文件放在容器中的&#x2F;docker-entrypoint-initdb.d&#x2F; 目录，在容器第一次启动时执行，之后重启容器不会重复执行。有时会出现权限不对的情况</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">root@ubuntu:/home/intbjw/docker/WJC2# docker-compose -f mongo.yml up</span><br><span class="line">Starting mongodb ... <span class="keyword">done</span></span><br><span class="line">Attaching to mongodb</span><br><span class="line">mongodb    | /usr/local/bin/docker-entrypoint.sh: line 385: /docker-entrypoint-initdb.d/mongo-init.sh: Permission denied</span><br><span class="line">mongodb exited with code 1</span><br></pre></td></tr></table></figure>
+
+<p>构建镜像时，终端输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">~/IdeaProjects/dockerdemo ⌚ 10:10:58</span><br><span class="line">$ docker build -t  web:1.0 .</span><br><span class="line">[+] Building 191.7s (9/9) FINISHED                                                                                                                                                                                                                                                                                      </span><br><span class="line"> =&gt; [internal] load build definition from Dockerfile                                                                                                                                                                                                                                                               0.1s</span><br><span class="line"> =&gt; =&gt; transferring dockerfile: 250B                                                                                                                                                                                                                                                                               0.0s</span><br><span class="line"> =&gt; [internal] load .dockerignore                                                                                                                                                                                                                                                                                  0.0s</span><br><span class="line"> =&gt; =&gt; transferring context: 2B                                                                                                                                                                                                                                                                                    0.0s</span><br><span class="line"> =&gt; [internal] load metadata <span class="keyword">for</span> docker.io/library/openjdk:8                                                                                                                                                                                                                                                      45.7s</span><br><span class="line"> =&gt; [internal] load build context                                                                                                                                                                                                                                                                                  0.4s</span><br><span class="line"> =&gt; =&gt; transferring context: 17.56MB                                                                                                                                                                                                                                                                               0.4s</span><br><span class="line"> =&gt; [1/3] FROM docker.io/library/openjdk:8@sha256:208812d8c45e0f5cb51c35b143094bd28322bad83ec8e463a1cbe3c5a6308b1f                                                                                                                                                                                               134.0s</span><br><span class="line"> =&gt; =&gt; resolve docker.io/library/openjdk:8@sha256:208812d8c45e0f5cb51c35b143094bd28322bad83ec8e463a1cbe3c5a6308b1f                                                                                                                                                                                                11.2s</span><br><span class="line"> =&gt; =&gt; sha256:47482c603b2a221f7f968380801639c3d108d18d33d77c93d44cfe8953c90548 7.81kB / 7.81kB                                                                                                                                                                                                                     0.0s</span><br><span class="line"> =&gt; =&gt; sha256:412caad352a3ecbb29c080379407ae0761e7b9b454f7239cbfd1d1da25e06b29 5.15MB / 5.15MB                                                                                                                                                                                                                    38.3s</span><br><span class="line"> =&gt; =&gt; sha256:208812d8c45e0f5cb51c35b143094bd28322bad83ec8e463a1cbe3c5a6308b1f 1.04kB / 1.04kB                                                                                                                                                                                                                     0.0s</span><br><span class="line"> =&gt; =&gt; sha256:93227b5ffb978363dfa3d493a0d25ccc943405260865437660bfec2af3174a73 1.79kB / 1.79kB                                                                                                                                                                                                                     0.0s</span><br><span class="line"> =&gt; =&gt; sha256:0c6b8ff8c37e92eb1ca65ed8917e818927d5bf318b6f18896049b5d9afc28343 54.92MB / 54.92MB                                                                                                                                                                                                                  60.0s</span><br><span class="line"> =&gt; =&gt; sha256:e6d3e61f7a504fa66d7275123969e9917570188650eb84b2280a726b996040f6 10.87MB / 10.87MB                                                                                                                                                                                                                  43.8s</span><br><span class="line"> =&gt; =&gt; sha256:461bb1d8c517c7f9fc0f1df66c9dc34c85a23421c1e1c540b2e28cbb258e75f5 54.57MB / 54.57MB                                                                                                                                                                                                                  95.2s</span><br><span class="line"> =&gt; =&gt; sha256:e442ee9d8dd9896a5b3b67117060f2af4ae8e997af7297009e7d0ea4b6595163 5.42MB / 5.42MB                                                                                                                                                                                                                    74.9s</span><br><span class="line"> =&gt; =&gt; sha256:36b5bcea956cbbcc7e16356354d5eb4b5b3834a43d708ca6c3fd048f33ddc579 211B / 211B                                                                                                                                                                                                                        88.1s</span><br><span class="line"> =&gt; =&gt; extracting sha256:0c6b8ff8c37e92eb1ca65ed8917e818927d5bf318b6f18896049b5d9afc28343                                                                                                                                                                                                                          2.4s</span><br><span class="line"> =&gt; =&gt; extracting sha256:412caad352a3ecbb29c080379407ae0761e7b9b454f7239cbfd1d1da25e06b29                                                                                                                                                                                                                          0.2s</span><br><span class="line"> =&gt; =&gt; extracting sha256:e6d3e61f7a504fa66d7275123969e9917570188650eb84b2280a726b996040f6                                                                                                                                                                                                                          0.3s</span><br><span class="line"> =&gt; =&gt; sha256:8ed70148ebcf78cba8546f5af3e152a6d9422a3a9d814d7683242e4663e773c3 106.07MB / 106.07MB                                                                                                                                                                                                               130.7s</span><br><span class="line"> =&gt; =&gt; extracting sha256:461bb1d8c517c7f9fc0f1df66c9dc34c85a23421c1e1c540b2e28cbb258e75f5                                                                                                                                                                                                                          3.6s</span><br><span class="line"> =&gt; =&gt; extracting sha256:e442ee9d8dd9896a5b3b67117060f2af4ae8e997af7297009e7d0ea4b6595163                                                                                                                                                                                                                          0.3s</span><br><span class="line"> =&gt; =&gt; extracting sha256:36b5bcea956cbbcc7e16356354d5eb4b5b3834a43d708ca6c3fd048f33ddc579                                                                                                                                                                                                                          0.0s</span><br><span class="line"> =&gt; =&gt; extracting sha256:8ed70148ebcf78cba8546f5af3e152a6d9422a3a9d814d7683242e4663e773c3                                                                                                                                                                                                                          3.1s</span><br><span class="line"> =&gt; [auth] library/openjdk:pull token <span class="keyword">for</span> registry-1.docker.io                                                                                                                                                                                                                                                     0.0s</span><br><span class="line"> =&gt; [2/3] ADD ./target/dockerdemo-0.0.1-SNAPSHOT.jar app.jar                                                                                                                                                                                                                                                       0.2s</span><br><span class="line"> =&gt; [3/3] RUN bash -c <span class="string">&#x27;touch /app.jar&#x27;</span>                                                                                                                                                                                                                                                                             0.4s</span><br><span class="line"> =&gt; exporting to image                                                                                                                                                                                                                                                                                             0.1s</span><br><span class="line"> =&gt; =&gt; exporting layers                                                                                                                                                                                                                                                                                            0.1s</span><br><span class="line"> =&gt; =&gt; writing image sha256:25dd4796c1ce0e27a2cabf65c8029e605a563535ba6d6ed5ec77a97f25429051                                                                                                                                                                                                                       0.0s</span><br><span class="line"> =&gt; =&gt; naming to docker.io/library/web:1.0</span><br></pre></td></tr></table></figure>
+
+<p>简单解释  <code>java -Djava.security.egd=file:/dev/./urandom -jar app.jar</code><br>在运行的时候配置随机数生成，在一定程度上加快随机数生成。securerandom在java各种组件中使用广泛，可以可靠的产生随机数。但大量产生随机数的情况下，性能会较低。例如产生UUID的场景。</p>
+<p>第一眼看到为什么是<code>/dev/./urandom</code> 而不是<code>/dev/urandom</code> 呢，这是jdk的一个bug引起的(现在还有没有不清楚)<br>，参考文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/Small_StarOne/article/details/102972211">https://blog.csdn.net/Small_StarOne&#x2F;article&#x2F;details&#x2F;102972211</a></p>
+<h1 id="使用Docker搭建Redis"><a href="#使用Docker搭建Redis" class="headerlink" title="使用Docker搭建Redis"></a>使用Docker搭建Redis</h1><p>docker hub官方文档</p>
+<p><a target="_blank" rel="noopener" href="https://hub.docker.com/_/redis">Redis - Official Image | Docker Hub</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker run -d \</span><br><span class="line">  -h redis \</span><br><span class="line">  -e REDIS_PASSWORD=redis \</span><br><span class="line">  -v redis-data:/data \</span><br><span class="line">  -p 7788:6379 \</span><br><span class="line">  --name redis \</span><br><span class="line">  --restart always \</span><br><span class="line">  redis:5.0.5-alpine3.9 /bin/sh -c <span class="string">&#x27;redis-server --appendonly yes --requirepass $&#123;REDIS_PASSWORD&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="使用Docker搭建Mongo"><a href="#使用Docker搭建Mongo" class="headerlink" title="使用Docker搭建Mongo"></a>使用Docker搭建Mongo</h1><p>docker hub官方文档</p>
+<p><a target="_blank" rel="noopener" href="https://hub.docker.com/_/mongo">Mongo - Official Image | Docker Hub</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/docker-library/docs/blob/master/mongo/README.md#supported-tags-and-respective-dockerfile-links">docs&#x2F;README.md at master · docker-library&#x2F;docs</a></p>
+<p><a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/42912755/how-to-create-a-db-for-mongodb-container-on-start-up">How to create a DB for MongoDB container on start up?</a></p>
+<p>docker-compose.yml</p>
+<figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">version: <span class="string">&#x27;3.8&#x27;</span></span><br><span class="line">services:</span><br><span class="line">  mongodb:</span><br><span class="line">    image: mongo</span><br><span class="line">    hostname: mongodb</span><br><span class="line">    command: [--auth]</span><br><span class="line">    environment:</span><br><span class="line">      MONGO_INITDB_ROOT_USERNAME: root</span><br><span class="line">      MONGO_INITDB_ROOT_PASSWORD: password</span><br><span class="line">      MONGO_INITDB_DATABASE: database</span><br><span class="line">      MONGO_USERNAME: username</span><br><span class="line">      MONGO_PASSWORD: password</span><br><span class="line">    volumes:</span><br><span class="line">      - ./.docker/mongo_data:/data/db</span><br><span class="line">      - ./mongo-init.sh:/docker-<span class="keyword">entrypoint</span><span class="language-bash">-initdb.d/mongo-init.sh</span></span><br></pre></td></tr></table></figure>
+
+<p>mongo-init.sh</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">mongo -- <span class="string">&quot;<span class="variable">$MONGO_INITDB_DATABASE</span>&quot;</span> &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">db = db.getSiblingDB(&#x27;admin&#x27;)</span></span><br><span class="line"><span class="string">db.auth(&#x27;$MONGO_INITDB_ROOT_USERNAME&#x27;, &#x27;$MONGO_INITDB_ROOT_PASSWORD&#x27;)</span></span><br><span class="line"><span class="string">db = db.getSiblingDB(&#x27;$MONGO_INITDB_DATABASE&#x27;)</span></span><br><span class="line"><span class="string">db.createUser(&#123;</span></span><br><span class="line"><span class="string">  user: &quot;$MONGO_USERNAME&quot;,</span></span><br><span class="line"><span class="string">  pwd: &quot;$MONGO_PASSWORD&quot;,</span></span><br><span class="line"><span class="string">  roles: [</span></span><br><span class="line"><span class="string">  &#123; role: &#x27;readWrite&#x27;, db: &#x27;$MONGO_INITDB_DATABASE&#x27; &#125;</span></span><br><span class="line"><span class="string">  ]</span></span><br><span class="line"><span class="string">&#125;)</span></span><br><span class="line"><span class="string">EOF</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="使用Docker部署Tomcat"><a href="#使用Docker部署Tomcat" class="headerlink" title="使用Docker部署Tomcat"></a>使用Docker部署Tomcat</h2><p>dockerfile</p>
+<figure class="highlight docker"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> tomcat:<span class="number">8.5</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#将webapp下的全部删除</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> <span class="built_in">rm</span> -rf /usr/local/tomcat/webapps/* \</span></span><br><span class="line"><span class="language-bash">&amp;&amp; useradd -ms /bin/bash tomcat \</span></span><br><span class="line"><span class="language-bash">&amp;&amp; <span class="built_in">chown</span> -R tomcat:tomcat /usr/local/tomcat/</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash"> <span class="built_in">chmod</span> 777 /usr/local/tomcat/bin/catalina.sh </span></span><br><span class="line"><span class="comment">#将target下的xx.war拷贝到/usr/local/tomcat/webapps/下</span></span><br><span class="line"><span class="keyword">ADD</span><span class="language-bash"> --<span class="built_in">chown</span>=tomcat ROOT.war /usr/local/tomcat/webapps/</span></span><br><span class="line"><span class="comment"># 设置启动用户</span></span><br><span class="line"><span class="keyword">USER</span> tomcat</span><br><span class="line"><span class="comment"># 设置工作目录</span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash"> /usr/local/tomcat</span></span><br><span class="line"><span class="comment">#端口</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">8080</span></span><br><span class="line"><span class="comment">#设置启动命令</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash"> [<span class="string">&quot;/usr/local/tomcat/bin/catalina.sh&quot;</span>,<span class="string">&quot;run&quot;</span>]</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="安装docker-compose"><a href="#安装docker-compose" class="headerlink" title="安装docker-compose"></a>安装docker-compose</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -L https://get.daocloud.io/docker/compose/releases/download/v2.10.2/docker-compose-`uname -s`-`uname -m` &gt; /usr/local/bin/docker-compose</span><br><span class="line">chmod +x /usr/local/bin/docker-compose</span><br></pre></td></tr></table></figure>
+
+<h1 id="docker资源限制"><a href="#docker资源限制" class="headerlink" title="docker资源限制"></a>docker资源限制</h1><p>docker-compose.yml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">service:</span><br><span class="line">  image: nginx</span><br><span class="line">  mem_limit: 512M</span><br><span class="line">  mem_reservation: 128M</span><br><span class="line">  cpus: 0.5</span><br><span class="line">  ports:</span><br><span class="line">    - &quot;80:80&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="踩坑记录："><a href="#踩坑记录：" class="headerlink" title="踩坑记录："></a>踩坑记录：</h2><ol>
+<li>docker</li>
+<li></li>
+</ol>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim /usr/lib/systemd/system/docker.service</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h1 id="最佳实践"><a href="#最佳实践" class="headerlink" title="最佳实践"></a>最佳实践</h1><ol>
+<li>镜像分层</li>
+<li></li>
+</ol>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/intbjw">项目</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%8C%82%E8%BD%BD"><span class="toc-number">1.</span> <span class="toc-text">数据挂载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#volumes%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="toc-number">1.0.1.</span> <span class="toc-text">volumes示例：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#bind-mount%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="toc-number">1.0.2.</span> <span class="toc-text">bind mount示例：</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#DockerFile"><span class="toc-number">2.</span> <span class="toc-text">DockerFile</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker-Compose%E4%BD%BF%E7%94%A8"><span class="toc-number">3.</span> <span class="toc-text">Docker Compose使用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BARedis"><span class="toc-number">4.</span> <span class="toc-text">使用Docker搭建Redis</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8Docker%E6%90%AD%E5%BB%BAMongo"><span class="toc-number">5.</span> <span class="toc-text">使用Docker搭建Mongo</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8Docker%E9%83%A8%E7%BD%B2Tomcat"><span class="toc-number">5.1.</span> <span class="toc-text">使用Docker部署Tomcat</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%89%E8%A3%85docker-compose"><span class="toc-number">6.</span> <span class="toc-text">安装docker-compose</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#docker%E8%B5%84%E6%BA%90%E9%99%90%E5%88%B6"><span class="toc-number">7.</span> <span class="toc-text">docker资源限制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95%EF%BC%9A"><span class="toc-number">7.1.</span> <span class="toc-text">踩坑记录：</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="toc-number">8.</span> <span class="toc-text">最佳实践</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&text=docker学习"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&title=docker学习"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&is_video=false&description=docker学习"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=docker学习&body=Check out this article: https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&title=docker学习"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&title=docker学习"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&title=docker学习"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&title=docker学习"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&name=docker学习&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://intbjw.github.io/2023/01/13/docker%E5%AD%A6%E4%B9%A0/&t=docker学习"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2020-2025
+    intBJW
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/intbjw">项目</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+  <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?0ae94ec1b308edd27e5393ae9c49cd4e";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+        </script>
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'intbjw/intbjw.github.io';
+      var utterances_issue_term = 'pathname';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-dark';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+</body>
+</html>

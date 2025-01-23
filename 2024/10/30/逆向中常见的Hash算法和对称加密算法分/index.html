@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="1 单向散列算法单向散列函数算法也称Hash（哈希）算法，是一种将任意长度的消息压缩到某一固定长度（消息摘要）的函数（该过程不可逆）。Hash函数可用于数字签名、消息的完整性检测、消息起源的认证检测等。常见的散列算法有MD5、SHA、RIPE-MD、HAVAL、N-Hash等。 在软件的加密保护中，Hash函数是经常用到的加密算法。但是，由于Hash函数为不可逆算法，所以软件只能使用Hash函数作">
+<meta property="og:type" content="article">
+<meta property="og:title" content="逆向中常见的Hash算法和对称加密算法">
+<meta property="og:url" content="https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/index.html">
+<meta property="og:site_name" content="intBJW&#39;s blog">
+<meta property="og:description" content="1 单向散列算法单向散列函数算法也称Hash（哈希）算法，是一种将任意长度的消息压缩到某一固定长度（消息摘要）的函数（该过程不可逆）。Hash函数可用于数字签名、消息的完整性检测、消息起源的认证检测等。常见的散列算法有MD5、SHA、RIPE-MD、HAVAL、N-Hash等。 在软件的加密保护中，Hash函数是经常用到的加密算法。但是，由于Hash函数为不可逆算法，所以软件只能使用Hash函数作">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://intbjw.github.io/imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%201.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%202.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%203.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%204.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%205.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%206.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%207.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%208.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%209.png">
+<meta property="og:image" content="https://intbjw.github.io/imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%2010.png">
+<meta property="article:published_time" content="2024-10-30T04:18:02.000Z">
+<meta property="article:modified_time" content="2025-01-23T07:01:12.045Z">
+<meta property="article:author" content="intBJW">
+<meta property="article:tag" content="逆向">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://intbjw.github.io/imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>逆向中常见的Hash算法和对称加密算法</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="intBJW&#39;s blog" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/intbjw">项目</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2024/11/18/%E7%AC%AC%E4%B8%83%E5%B1%8A%E6%B5%99%E6%B1%9F%E7%9C%81%E5%A4%A7%E5%AD%A6%E7%94%9F%E7%BD%91%E7%BB%9C%E4%B8%8E%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E7%AB%9E%E8%B5%9B%E5%86%B3%E8%B5%9B%20Reverse/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2023/07/19/vscode%E4%B8%8B%E8%BD%BD%E8%BF%87%E6%85%A2%E8%A7%A3%E5%86%B3/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&text=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&title=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&is_video=false&description=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向中常见的Hash算法和对称加密算法&body=Check out this article: https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&title=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&title=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&title=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&title=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&name=逆向中常见的Hash算法和对称加密算法&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&t=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%8D%95%E5%90%91%E6%95%A3%E5%88%97%E7%AE%97%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">1 单向散列算法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-MD5%E7%AE%97%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 MD5算法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-1-%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86"><span class="toc-number">1.1.1.</span> <span class="toc-text">1.1.1 算法原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-2-%E7%A4%BA%E4%BE%8B"><span class="toc-number">1.1.2.</span> <span class="toc-text">1.1.2 示例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 其他算法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">2 对称加密算法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-RC4%E6%B5%81%E5%AF%86%E7%A0%81"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 RC4流密码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-TEA%E7%AE%97%E6%B3%95"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 TEA算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-SM4%E5%9B%BD%E5%AF%86%E7%AE%97%E6%B3%95"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 SM4国密算法</span></a></li></ol></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        逆向中常见的Hash算法和对称加密算法
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">intBJW</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2024-10-30T04:18:02.000Z" class="dt-published" itemprop="datePublished">2024-10-30</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E9%80%86%E5%90%91/" rel="tag">逆向</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="1-单向散列算法"><a href="#1-单向散列算法" class="headerlink" title="1 单向散列算法"></a>1 单向散列算法</h2><p>单向散列函数算法也称Hash（哈希）算法，是一种将任意长度的消息压缩到某一固定长度（消息摘要）的函数（该过程不可逆）。Hash函数可用于数字签名、消息的完整性检测、消息起源的认证检测等。常见的<br>散列算法有MD5、SHA、RIPE-MD、HAVAL、N-Hash等。</p>
+<p>在软件的加密保护中，Hash函数是经常用到的加密算法。但是，由于Hash函数为不可逆算法，所以<br>软件只能使用Hash函数作为一个加密的中间步骤。例如，对用户名做一个Hash变换，将这个结果再进行<br>一个可逆的加密变换（如对称密码），变换结果为注册码。从解密角度来说，一般不必了解Hash函数的<br>具体内容（变种算法除外），只要能识别出是何种Hash函数就可以了，然后直接套用相关算法源码实现。</p>
+<h3 id="1-1-MD5算法"><a href="#1-1-MD5算法" class="headerlink" title="1.1 MD5算法"></a>1.1 MD5算法</h3><p>MD5算法消息摘要算法对任意长度的消息进行运算，产生一个128位的消息摘要。近年来，随着穷举攻击和密码分析的发展，应用最为广泛的MD5算法已经不再那么流行了。</p>
+<h4 id="1-1-1-算法原理"><a href="#1-1-1-算法原理" class="headerlink" title="1.1.1 算法原理"></a>1.1.1 算法原理</h4><ol>
+<li><p>数据填充</p>
+<p>填充消息使其长度与448模512同余（即长度&#x3D;448 mod512）。也就是说，填充后的消息长度比512<br>的倍数仅小64位的数。即使消息长度本身已经满足上述长度要求，仍然需要填充。 填充方法是附一个1在消息后面，然后用0来进行填充，直到消息的长度与448模512同余。至少填<br>充1位，至多填充512位。</p>
+</li>
+<li><p>添加长度</p>
+<p>在第一步的结果之后附上64位的消息长度。如果填充前消息的长度大于24，贝 则只使用其低64位。<br>这时，在添加完填充位和消息长度之后，最终消息的长度正好就是512的整数倍了。 令M[0…N-1]表示最终的消息，其中N是16的倍数。</p>
+</li>
+<li><p>初始化变量</p>
+<p>用到4个变量 量（A，B,C,D）来计算消息摘要。这里A,B,C,D分别都是一个32位的寄存器。这些寄 存器以下面的十六进制数值来初始化：A&#x3D;01234567h，<br>B&#x3D;89abcdefh, C&#x3D;fedcba98h, D&#x3D;76543210h。 并且在内存中是以低字节在前的形式来存储的，民 即如下格式：</p>
+<p><strong>01 23 45 67 89 AB CD EF FE DC BA 86 76 54 32 10</strong></p>
+</li>
+<li><p>数据处理<br><img src="/../imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image.png" alt="image.png"></p>
+</li>
+<li><p>输出</p>
+<p>当所有的512位分组都运算完毕后，ABCD的级联将被输出为MD5散列的结果。以上是MD5算法的 简单描述，更 更为详细的实现程序，<br>请参考光盘中的源代码。</p>
+</li>
+</ol>
+<h4 id="1-1-2-示例"><a href="#1-1-2-示例" class="headerlink" title="1.1.2 示例"></a>1.1.2 示例</h4><p>使用加密与解密中的随书文件<strong>MD5KeyGenMe.exe</strong>来分析<br><img src="/../imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%201.png" alt="image 1.png"></p>
+<p>打开程序发现需要输入两个text来进行验证，通过导入表中的**<code>GetDlgItemTextA</code>**函数定位到关键代码</p>
+<p><img src="/../imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%202.png" alt="image 2.png"><br><img src="/../imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%203.png" alt="image 3.png"><br><code>sub_4010A0</code>函数反编译后的代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">int __cdecl sub_4010A0(HWND hDlg)</span><br><span class="line">&#123;</span><br><span class="line">  UINT DlgItemTextA; // edi</span><br><span class="line">  int v2; // eax</span><br><span class="line">  int i; // eax</span><br><span class="line">  int v4; // ecx</span><br><span class="line">  CHAR String1[17]; // [esp+10h] [ebp-3C8h] BYREF</span><br><span class="line">  __int16 v7; // [esp+21h] [ebp-3B7h]</span><br><span class="line">  char v8; // [esp+23h] [ebp-3B5h]</span><br><span class="line">  CHAR v9[24]; // [esp+24h] [ebp-3B4h] BYREF</span><br><span class="line">  char v10[36]; // [esp+3Ch] [ebp-39Ch] BYREF</span><br><span class="line">  CHAR v11[197]; // [esp+60h] [ebp-378h] BYREF</span><br><span class="line">  __int16 v12; // [esp+125h] [ebp-2B3h]</span><br><span class="line">  char v13; // [esp+127h] [ebp-2B1h]</span><br><span class="line">  _DWORD v14[22]; // [esp+128h] [ebp-2B0h] BYREF</span><br><span class="line">  _BYTE v15[197]; // [esp+180h] [ebp-258h] BYREF</span><br><span class="line">  __int16 v16; // [esp+245h] [ebp-193h]</span><br><span class="line">  char v17; // [esp+247h] [ebp-191h]</span><br><span class="line">  CHAR String[197]; // [esp+248h] [ebp-190h] BYREF</span><br><span class="line">  __int16 v19; // [esp+30Dh] [ebp-CBh]</span><br><span class="line">  char v20; // [esp+30Fh] [ebp-C9h]</span><br><span class="line">  CHAR String2[197]; // [esp+310h] [ebp-C8h] BYREF</span><br><span class="line">  __int16 v22; // [esp+3D5h] [ebp-3h]</span><br><span class="line">  char v23; // [esp+3D7h] [ebp-1h]</span><br><span class="line"></span><br><span class="line">  memset(String, 0, sizeof(String));</span><br><span class="line">  memset(v15, 0, sizeof(v15));</span><br><span class="line">  v19 = 0;</span><br><span class="line">  v20 = 0;</span><br><span class="line">  memset(String2, 0, sizeof(String2));</span><br><span class="line">  v16 = 0;</span><br><span class="line">  v17 = 0;</span><br><span class="line">  memset(v11, 0, sizeof(v11));</span><br><span class="line">  v22 = 0;</span><br><span class="line">  v23 = 0;</span><br><span class="line">  v12 = 0;</span><br><span class="line">  v13 = 0;</span><br><span class="line">  qmemcpy(v9, aWwwPediyCom, 0x15u);</span><br><span class="line">  strcpy(v10, &quot;23456789ABCDEFGHJKLMNPQRSTUVWXYZ&quot;);</span><br><span class="line">  v7 = 0;</span><br><span class="line">  memset(String1, 0, sizeof(String1));</span><br><span class="line">  v8 = 0;</span><br><span class="line">  DlgItemTextA = GetDlgItemTextA(hDlg, 1000, String, 201);</span><br><span class="line">  if ( !DlgItemTextA )</span><br><span class="line">    goto LABEL_10;</span><br><span class="line">  if ( GetDlgItemTextA(hDlg, 1001, v11, 201) != 19 )</span><br><span class="line">    goto LABEL_10;</span><br><span class="line">  if ( v11[4] != 45 )</span><br><span class="line">    goto LABEL_10;</span><br><span class="line">  if ( v11[9] != 45 )</span><br><span class="line">    goto LABEL_10;</span><br><span class="line">  if ( v11[14] != 45 )</span><br><span class="line">    goto LABEL_10;</span><br><span class="line">  *(_DWORD *)&amp;String1[4] = *(_DWORD *)&amp;v11[5];</span><br><span class="line">  *(_DWORD *)String1 = *(_DWORD *)v11;</span><br><span class="line">  *(_DWORD *)&amp;String1[8] = *(_DWORD *)&amp;v11[10];</span><br><span class="line">  *(_DWORD *)&amp;String1[12] = *(_DWORD *)&amp;v11[15];</span><br><span class="line">  sub_4012B0(v14);</span><br><span class="line">  sub_4012E0(v14, String, DlgItemTextA);</span><br><span class="line">  v2 = lstrlenA(v9);</span><br><span class="line">  sub_4012E0(v14, v9, v2);</span><br><span class="line">  sub_401390(v15, v14);</span><br><span class="line">  for ( i = 0; i &lt; 16; String2[i - 1] = v10[v4] )</span><br><span class="line">    v4 = v15[i++] &amp; 0x1F;</span><br><span class="line">  if ( !lstrcmpA(String1, String2) )</span><br><span class="line">  &#123;</span><br><span class="line">    SetDlgItemTextA(hDlg, 1001, ::String);</span><br><span class="line">    return 1;</span><br><span class="line">  &#125;</span><br><span class="line">  else</span><br><span class="line">  &#123;</span><br><span class="line">LABEL_10:</span><br><span class="line">    SetDlgItemTextA(hDlg, 1001, aWrongSerial);</span><br><span class="line">    return 0;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>跟进函数<code>sub_4012B0</code>发现MD5特征</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">_DWORD *__cdecl sub_4012B0(_DWORD *a1)</span><br><span class="line">&#123;</span><br><span class="line">  _DWORD *result; // eax</span><br><span class="line"></span><br><span class="line">  result = a1;</span><br><span class="line">  a1[5] = 0;</span><br><span class="line">  a1[4] = 0;</span><br><span class="line">  *a1 = 0x67452301;</span><br><span class="line">  a1[1] = 0xEFCDAB89;</span><br><span class="line">  a1[2] = 0x98BADCFE;</span><br><span class="line">  a1[3] = 0x10325476;</span><br><span class="line">  return result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>当然也可以直接使用插件判断算法</p>
+<p><img src="/../imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%204.png" alt="image 4.png"><br>分析代码<br><img src="/../imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%205.png" alt="image 5.png"></p>
+<p>把name和pediy.com做一个拼接，然后在做一次变换得倒最终的序列号</p>
+<p>编写注册机</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">from hashlib import md5</span><br><span class="line"></span><br><span class="line">name = b&#x27;bjw&#x27;</span><br><span class="line"># 坑 这里不能用hex</span><br><span class="line">digest = md5(name + b&#x27;www.pediy.com&#x27;).digest()</span><br><span class="line">print(f&#x27;MD5(&#123;name&#125;)=&#123;digest.hex()&#125;&#x27;)</span><br><span class="line">a2345 = &#x27;23456789ABCDEFGHJKLMNPQRSTUVWXYZ&#x27;</span><br><span class="line">serial_number = &#x27;&#x27;</span><br><span class="line">for b in digest:</span><br><span class="line">    serial_number += a2345[b &amp; 0x1F]</span><br><span class="line">print(f&#x27;Serial Number(&#123;name&#125;)=&#123;serial_number[0:4]&#125;-&#123;serial_number[4:8]&#125;-&#123;serial_number[8:12]&#125;-&#123;serial_number[12:16]&#125;&#x27;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-其他算法"><a href="#1-2-其他算法" class="headerlink" title="1.2 其他算法"></a>1.2 其他算法</h3><p>SHA算法特征值</p>
+<p><img src="/../imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%206.png" alt="image 6.png"><br><img src="/../imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%207.png" alt="image 7.png"></p>
+<h2 id="2-对称加密算法"><a href="#2-对称加密算法" class="headerlink" title="2 对称加密算法"></a>2 对称加密算法</h2><p>常见的对称分组加密算法有 DES(Data EncryptionStandard)、IDEA（Intemational 1Data Encryption<br>Algorithm）、AES（AdvancedEncryptionStandard）、BlowFish、Twofish等。本节将以常见的对称加密算法TEA、IDEA、BlowFish、AES及流密码RC4为例，介绍对称算法在软件保护中的应用。感兴趣的读者可<br>以进一步阅读密码学相关书籍，如《对称密码学》（机械工业出版社）来了解更多的关于对称密码的知识。</p>
+<h3 id="2-1-RC4流密码"><a href="#2-1-RC4流密码" class="headerlink" title="2.1 RC4流密码"></a>2.1 RC4流密码</h3><p>RC4生成一种称为密钥流的伪随机流，它同明文通过异或操作相混合以达到加密的目的，解密时，同密文进行异或操作。其密钥流的生成由两部分组成：KSA和PRGA。</p>
+<p><img src="/../imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%208.png" alt="image 8.png"><br>(1） KSA ( the Key-Scheduling Algorithn )</p>
+<p>RC4 首先使用密钥调度算法（KSA）完成对大小为 256字节的数组S的初始化及替换，在替 换时使用密钥。其密钥的长度一般取 5～16 字节，即<br>40～128 位，也可以更长，通常不超过 256 位。先用0～255初始化数组S，然后使用密钥进行替换，伪代码如下。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">for i=0 to 255 do</span><br><span class="line">  S[i]:=i;</span><br><span class="line">j:=0;</span><br><span class="line"></span><br><span class="line">for i=0 to 255 do</span><br><span class="line">  j:=(j+S[i]+key[i mod keylength]) mod 256; //重复使用密钥</span><br><span class="line">  Swap(s[i],S[j]); //交换s[i]与s[j]</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>(2） PRGA( the Pseudo-Random Generation Algorithm) 数组S在完成初始化之后，便不再使用输人的密钥。密钥流的生成是从ST0]<br>到ST255]的。对每 个S[]，根据当前S的值，将S[]与S中的另一字节置换。在S[255]完成转换后，操作仍重复执行。 伪代码如下。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">i,j=0;</span><br><span class="line">while(明文未结束)</span><br><span class="line">  i=(i+1）mod 256;</span><br><span class="line">  j=（j+S[i]）mod256;</span><br><span class="line">  Swap(s[i],S[j]);</span><br><span class="line">  t=(S[i]+S[j]）mod256;</span><br><span class="line">  k=S[t];</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>得到的子密码k用于和明文进行XOR运算，得到密文。解密过程也完全相同。由于RC4算法 在加密时采用的是XOR运算，一旦子密钥序列出现了重复，密文就有可能被破解。因此，在使用<br>RC4算法时，必须对加密密钥进行测试，以判断其是否为弱密钥。</p>
+<h3 id="2-2-TEA算法"><a href="#2-2-TEA算法" class="headerlink" title="2.2 TEA算法"></a>2.2 TEA算法</h3><p>TEA是分组密码，分组长度为64位，密钥长度为128位，采用Feistel网络。</p>
+<p>其加密过程也比较简单。</p>
+<p>算法的特征为<code>delta = 0x9E377989</code>，这个常量是由黄金分割点得来的。TEA的变种算法也常用到这个变量，但是加密过程不同。</p>
+<p>在加密轮数方面，作者推荐的加密轮数是64轮，即循环32次，也可以采用其他加密轮数，比如32轮或者128轮，在分析的时候也需要注意。</p>
+<p>如下图：</p>
+<p><img src="/../imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%209.png" alt="image 9.png"></p>
+<h3 id="2-3-SM4国密算法"><a href="#2-3-SM4国密算法" class="headerlink" title="2.3 SM4国密算法"></a>2.3 SM4国密算法</h3><p>SM4是一个分组算法，分组长度为128比特，密钥成都为128比特其结构是Fesitel网络的一个变体。</p>
+<p>SM4的特征为S-box</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">static const unsigned char SboxTable[16][16] =</span><br><span class="line">&#123;</span><br><span class="line">&#123;0xd6,0x90,0xe9,0xfe,0xcc,0xe1,0x3d,0xb7,0x16,0xb6,0x14,0xc2,0x28,0xfb,0x2c,0x05&#125;,</span><br><span class="line">&#123;0x2b,0x67,0x9a,0x76,0x2a,0xbe,0x04,0xc3,0xaa,0x44,0x13,0x26,0x49,0x86,0x06,0x99&#125;,</span><br><span class="line">&#123;0x9c,0x42,0x50,0xf4,0x91,0xef,0x98,0x7a,0x33,0x54,0x0b,0x43,0xed,0xcf,0xac,0x62&#125;,</span><br><span class="line">&#123;0xe4,0xb3,0x1c,0xa9,0xc9,0x08,0xe8,0x95,0x80,0xdf,0x94,0xfa,0x75,0x8f,0x3f,0xa6&#125;,</span><br><span class="line">&#123;0x47,0x07,0xa7,0xfc,0xf3,0x73,0x17,0xba,0x83,0x59,0x3c,0x19,0xe6,0x85,0x4f,0xa8&#125;,</span><br><span class="line">&#123;0x68,0x6b,0x81,0xb2,0x71,0x64,0xda,0x8b,0xf8,0xeb,0x0f,0x4b,0x70,0x56,0x9d,0x35&#125;,</span><br><span class="line">&#123;0x1e,0x24,0x0e,0x5e,0x63,0x58,0xd1,0xa2,0x25,0x22,0x7c,0x3b,0x01,0x21,0x78,0x87&#125;,</span><br><span class="line">&#123;0xd4,0x00,0x46,0x57,0x9f,0xd3,0x27,0x52,0x4c,0x36,0x02,0xe7,0xa0,0xc4,0xc8,0x9e&#125;,</span><br><span class="line">&#123;0xea,0xbf,0x8a,0xd2,0x40,0xc7,0x38,0xb5,0xa3,0xf7,0xf2,0xce,0xf9,0x61,0x15,0xa1&#125;,</span><br><span class="line">&#123;0xe0,0xae,0x5d,0xa4,0x9b,0x34,0x1a,0x55,0xad,0x93,0x32,0x30,0xf5,0x8c,0xb1,0xe3&#125;,</span><br><span class="line">&#123;0x1d,0xf6,0xe2,0x2e,0x82,0x66,0xca,0x60,0xc0,0x29,0x23,0xab,0x0d,0x53,0x4e,0x6f&#125;,</span><br><span class="line">&#123;0xd5,0xdb,0x37,0x45,0xde,0xfd,0x8e,0x2f,0x03,0xff,0x6a,0x72,0x6d,0x6c,0x5b,0x51&#125;,</span><br><span class="line">&#123;0x8d,0x1b,0xaf,0x92,0xbb,0xdd,0xbc,0x7f,0x11,0xd9,0x5c,0x41,0x1f,0x10,0x5a,0xd8&#125;,</span><br><span class="line">&#123;0x0a,0xc1,0x31,0x88,0xa5,0xcd,0x7b,0xbd,0x2d,0x74,0xd0,0x12,0xb8,0xe5,0xb4,0xb0&#125;,</span><br><span class="line">&#123;0x89,0x69,0x97,0x4a,0x0c,0x96,0x77,0x7e,0x65,0xb9,0xf1,0x09,0xc5,0x6e,0xc6,0x84&#125;,</span><br><span class="line">&#123;0x18,0xf0,0x7d,0xec,0x3a,0xdc,0x4d,0x20,0x79,0xee,0x5f,0x3e,0xd7,0xcb,0x39,0x48&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><img src="/../imgs/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86%2012fe7c086b3080088cf1e2c306f6e97a/image%2010.png" alt="image 10.png"></p>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/intbjw">项目</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%8D%95%E5%90%91%E6%95%A3%E5%88%97%E7%AE%97%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">1 单向散列算法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1-MD5%E7%AE%97%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">1.1 MD5算法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-1-%E7%AE%97%E6%B3%95%E5%8E%9F%E7%90%86"><span class="toc-number">1.1.1.</span> <span class="toc-text">1.1.1 算法原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-2-%E7%A4%BA%E4%BE%8B"><span class="toc-number">1.1.2.</span> <span class="toc-text">1.1.2 示例</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2-%E5%85%B6%E4%BB%96%E7%AE%97%E6%B3%95"><span class="toc-number">1.2.</span> <span class="toc-text">1.2 其他算法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">2 对称加密算法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-RC4%E6%B5%81%E5%AF%86%E7%A0%81"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 RC4流密码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-TEA%E7%AE%97%E6%B3%95"><span class="toc-number">2.2.</span> <span class="toc-text">2.2 TEA算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-SM4%E5%9B%BD%E5%AF%86%E7%AE%97%E6%B3%95"><span class="toc-number">2.3.</span> <span class="toc-text">2.3 SM4国密算法</span></a></li></ol></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&text=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&title=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&is_video=false&description=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=逆向中常见的Hash算法和对称加密算法&body=Check out this article: https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&title=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&title=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&title=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&title=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&name=逆向中常见的Hash算法和对称加密算法&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://intbjw.github.io/2024/10/30/%E9%80%86%E5%90%91%E4%B8%AD%E5%B8%B8%E8%A7%81%E7%9A%84Hash%E7%AE%97%E6%B3%95%E5%92%8C%E5%AF%B9%E7%A7%B0%E5%8A%A0%E5%AF%86%E7%AE%97%E6%B3%95%E5%88%86/&t=逆向中常见的Hash算法和对称加密算法"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2020-2025
+    intBJW
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/intbjw">项目</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+  <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?0ae94ec1b308edd27e5393ae9c49cd4e";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+        </script>
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'intbjw/intbjw.github.io';
+      var utterances_issue_term = 'pathname';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-dark';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+</body>
+</html>

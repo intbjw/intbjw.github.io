@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="1. Bug复现复现是调试的第一步。此处使用的是chrome提供的官方环境 Demo: Get Started Debugging JavaScript with Chrome DevTools  在一个新的标签页打开demo    输入数字，计算结果，获得的结果并不对，不是数字相加，而是字符串相加，这时bug就出现啦。也就是你要修复的点。  ![Untitled](..&#x2F;imgs&amp;#x">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JS Debug">
+<meta property="og:url" content="https://intbjw.github.io/2022/08/17/JS%20Debug/index.html">
+<meta property="og:site_name" content="intBJW&#39;s blog">
+<meta property="og:description" content="1. Bug复现复现是调试的第一步。此处使用的是chrome提供的官方环境 Demo: Get Started Debugging JavaScript with Chrome DevTools  在一个新的标签页打开demo    输入数字，计算结果，获得的结果并不对，不是数字相加，而是字符串相加，这时bug就出现啦。也就是你要修复的点。  ![Untitled](..&#x2F;imgs&amp;#x">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://intbjw.github.io/imgs/JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34/Untitled.png">
+<meta property="article:published_time" content="2022-08-17T04:18:02.000Z">
+<meta property="article:modified_time" content="2025-01-23T07:04:20.760Z">
+<meta property="article:author" content="intBJW">
+<meta property="article:tag" content="逆向">
+<meta property="article:tag" content="JS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://intbjw.github.io/imgs/JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34/Untitled.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>JS Debug</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="intBJW&#39;s blog" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/intbjw">项目</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2022/11/10/goreleaser%20%E6%96%B9%E4%BE%BF%E7%9A%84go%20%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%8C%85%E5%88%86%E5%8F%91%E5%B7%A5%E5%85%B7/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2022/08/12/Golang%E9%80%86%E5%90%91/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://intbjw.github.io/2022/08/17/JS%20Debug/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&text=JS Debug"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&title=JS Debug"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&is_video=false&description=JS Debug"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JS Debug&body=Check out this article: https://intbjw.github.io/2022/08/17/JS%20Debug/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&title=JS Debug"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&title=JS Debug"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&title=JS Debug"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&title=JS Debug"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&name=JS Debug&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://intbjw.github.io/2022/08/17/JS%20Debug/&t=JS Debug"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Bug%E5%A4%8D%E7%8E%B0"><span class="toc-number">1.</span> <span class="toc-text">1. Bug复现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%86%9F%E6%82%89Sources"><span class="toc-number">2.</span> <span class="toc-text">2. 熟悉Sources</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BD%BF%E7%94%A8%E6%96%AD%E7%82%B9%E6%9A%82%E5%81%9C%E4%BB%A3%E7%A0%81"><span class="toc-number">3.</span> <span class="toc-text">3. 使用断点暂停代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E9%80%90%E6%AD%A5%E8%B0%83%E8%AF%95%E4%BB%A3%E7%A0%81"><span class="toc-number">4.</span> <span class="toc-text">4. 逐步调试代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%A0%81%E8%A1%8C%E6%96%AD%E7%82%B9"><span class="toc-number">5.</span> <span class="toc-text">5. 设置代码行断点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E6%A3%80%E6%9F%A5%E5%8F%98%E9%87%8F%E5%80%BC"><span class="toc-number">6.</span> <span class="toc-text">6. 检查变量值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E4%B8%80%EF%BC%9A%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%9D%A2%E6%9D%BF"><span class="toc-number">6.1.</span> <span class="toc-text">方法一：作用域面板</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%EF%BC%9Achinaz-com"><span class="toc-number">7.</span> <span class="toc-text">案例：chinaz.com</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        JS Debug
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">intBJW</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-08-17T04:18:02.000Z" class="dt-published" itemprop="datePublished">2022-08-17</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/JS/" rel="tag">JS</a>, <a class="p-category" href="/tags/%E9%80%86%E5%90%91/" rel="tag">逆向</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="1-Bug复现"><a href="#1-Bug复现" class="headerlink" title="1. Bug复现"></a>1. Bug复现</h2><p>复现是调试的第一步。此处使用的是chrome提供的官方环境</p>
+<p><a target="_blank" rel="noopener" href="https://googlechrome.github.io/devtools-samples/debug-js/get-started">Demo: Get Started Debugging JavaScript with Chrome DevTools</a></p>
+<ol>
+<li>在一个新的标签页打开demo</li>
+</ol>
+<p><img src="/../imgs/JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34/Untitled.png" alt="Untitled"></p>
+<ol>
+<li>输入数字，计算结果，获得的结果并不对，不是数字相加，而是字符串相加，这时bug就出现啦。也就是你要修复的点。</li>
+</ol>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 1.png)</p>
+<h2 id="2-熟悉Sources"><a href="#2-熟悉Sources" class="headerlink" title="2. 熟悉Sources"></a>2. 熟悉Sources</h2><p>DevTools为不同的任务提供了许多不同的工具，例如更改CSS、分析页面加载性能和监控网络请求。Sources面板是调试JavaScript的地方。</p>
+<ol>
+<li><p>通过快捷键 command+option+i 打开Console面板</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 2.png)</p>
+</li>
+<li><p>点击Souce标签</p>
+
+
+<p>Sources面板有三个部分</p>
+
+
+<ul>
+<li>文件导航面板，在这里你将会看到页面中所有请求的文件</li>
+<li>代码编辑器，在文件导航面板中选择文件后，文件的内容将会展示</li>
+<li>JavaScript 调试器，用于检测JavaScript的各种功能工具</li>
+</ul>
+</li>
+</ol>
+<h2 id="3-使用断点暂停代码"><a href="#3-使用断点暂停代码" class="headerlink" title="3. 使用断点暂停代码"></a>3. 使用断点暂停代码</h2><p>解决这类问题常见的调试方法就是在代码中插入<code>console.log()</code></p>
+<p>例子：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">updateLabel</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">var</span> addend1 = <span class="title function_">getNumber1</span>();</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;addend1:&#x27;</span>, addend1);</span><br><span class="line">    <span class="keyword">var</span> addend2 = <span class="title function_">getNumber2</span>();</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;addend2:&#x27;</span>, addend2);</span><br><span class="line">    <span class="keyword">var</span> sum = addend1 + addend2;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;sum:&#x27;</span>, sum);</span><br><span class="line">    label.<span class="property">textContent</span> = addend1 + <span class="string">&#x27; + &#x27;</span> + addend2 + <span class="string">&#x27; = &#x27;</span> + sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>console.log()<br>方法可以解决这类问题，但是断点可以更快地完成这项工作。断点允许您在代码执行过程中暂停代码，并及时检查该时刻的所有值。与console.log()<br>方法相比，断点有一下优势:</p>
+<ul>
+<li>使用<code>console. log()</code>，您需要手动打开源代码，找到相关的代码，插入<code>Console. log()</code><br>语句，然后重新加载页面，以便在Console中查看消息。使用断点，您可以暂停相关的代码，甚至不知道代码是如何构造的。</li>
+<li>在<code>console.log()</code>语句中，需要显式指定要检查的每个值。有了断点，DevTools就会显示出当时所有变量的值。有时候，甚至都没有意识到一些变量会影响到了代码。</li>
+</ul>
+<p>简而言之，相比使用<code>console.log()</code> 方法，断点能够帮助你更快的找到并修复漏洞。</p>
+<p>如果你想知道程是怎么运行的，你可以有根据的去猜测错误的计算是在click事件触发后计算出来的。因此，您可能希望在单击侦听器执行时暂停代码。事件侦听器断点可以让你做到这一点:</p>
+<ol>
+<li><p>在“JavaScript调试”面板中，单击“事件监听器断点”以展开该部分。DevTools显示了一个可扩展的事件类别列表，如动画和剪贴板。</p>
+</li>
+<li><p>在“鼠标”事件类别旁边，单击“展开”。DevTools显示了一个鼠标事件列表，比如点击和鼠标按下。每个事件旁边都有一个复选框。</p>
+</li>
+<li><p>选中click复选框。DevTools现在设置为当任何点击事件监听器执行时自动暂停。</p>
+</li>
+<li><p>返回demo，再次单击Add Number 1和Number<br>2。DevTools暂停演示并突出显示源代码面板中的一行代码。DevTools应该在这行代码中暂停:</p>
+ <figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">onClick</span>(<span class="params"></span>) &#123;</span><br></pre></td></tr></table></figure>
+
+<p>如果你暂停到了不是这行代码，可以点击继续执行脚本按钮，直到暂停这行代码。</p>
+<p>注意，如果你浏览器有插件可能注册了<code>click</code>事件，调试的过程中可能暂停在了插件的<code>click</code>监听器，你可以使用隐私模式来访网页</p>
+</li>
+</ol>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 5.png)</p>
+<p>事件监听器断点只是DevTools中许多类型的断点之一。记住所有不同的类型是值得的，因为每种类型最终都会帮助您尽可能快地调试不同的场景。请参阅<a target="_blank" rel="noopener" href="https://developer.chrome.com/docs/devtools/javascript/breakpoints/">暂停使用断点的代码</a><br>，以了解何时以及如何使用每种类型。</p>
+<h2 id="4-逐步调试代码"><a href="#4-逐步调试代码" class="headerlink" title="4. 逐步调试代码"></a>4. 逐步调试代码</h2><p>bug的一个常见原因是脚本以错误的顺序执行。您能够逐行检查代码的执行，每次一行，并准确地找出它在哪里以与您预期不同的顺序执行。</p>
+<ol>
+<li><p>在DevTools的source面板上，单击Step into next函数调用Step into next函数调用来逐步执行<code>onClick()</code><br>函数，一次一行。DevTools突出显示了以下一行代码:</p>
+ <figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="title function_">inputsAreEmpty</span>()) &#123;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>单击下一步函数调用的步骤。DevTools执行<code>inputsAreEmpty()</code>而不进入它。注意，DevTools跳过了几行代码。这是因为<br><code>inputsAreEmpty()</code>的计算结果为false，因此if语句的代码块没有执行。</p>
+</li>
+</ol>
+<h2 id="5-设置代码行断点"><a href="#5-设置代码行断点" class="headerlink" title="5. 设置代码行断点"></a>5. 设置代码行断点</h2><p>代码行中断点是最常见的中断点类型。当你想暂停某一行代码时，可以使用代码行断点。</p>
+<ol>
+<li>看updateLabel()中的最后一行代码。</li>
+<li>在代码的左边，你可以看到这一行代码的行号，是32。点击32。DevTools在32的上面放了一个蓝色图标。这意味着在这一行有一个代码行的断点。DevTools现在总是在执行这行代码之前暂停。</li>
+<li>点击恢复脚本的执行 恢复脚本的执行。脚本继续执行，直到它到达第32行。在第29、30和31行，DevTools打印出addend1、addend2的值，以及每行分号右边的sum。</li>
+</ol>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 6.png)</p>
+<h2 id="6-检查变量值"><a href="#6-检查变量值" class="headerlink" title="6. 检查变量值"></a>6. 检查变量值</h2><p><code>addend1</code>、<code>addend2</code>和<code>sum</code>的值看起来很可疑。它们被引号包裹着，这意味着它们是字符串。这是一个很好的假设，可以解释错误的原因。现在是时候收集更多的信息了。DevTools提供了很多检查变量值的工具。</p>
+<h3 id="方法一：作用域面板"><a href="#方法一：作用域面板" class="headerlink" title="方法一：作用域面板"></a>方法一：作用域面板</h3><p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 7.png)</p>
+<h2 id="案例：chinaz-com"><a href="#案例：chinaz-com" class="headerlink" title="案例：chinaz.com"></a>案例：chinaz.com</h2><p>背景：</p>
+<p>在某天wego使用chinaz.com查询icp数据没有数据，用burp抓包分析，发现在请求时返回口令不正确稍后再试</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 8.png)</p>
+<p>访问网站重新抓包发现请求数据包中存在token字段</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 9.png)</p>
+<p>使用debug，分析token的生成</p>
+<p>在XHR中设置断点，设置网址包含 <code>/Home/PageData</code> <code>/Home/QiYeData</code></p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 10.png)</p>
+<p>点击查询按钮</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 11.png)</p>
+<p>浏览器在此处停止</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 12.png)</p>
+<p>连续跳出当前函数，发现post数据包</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 13.png)</p>
+<p>进一步发先token所在位置</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 14.png)</p>
+<p>找到token生成的函数为<code>generateWordKey</code> ，参数为公司名称</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 15.png)</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 16.png)</p>
+<p>在generatetoken.js下断点进行观察</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 17.png)</p>
+<p>从变量中也验证了token的生成算法是根据一个随机数和公司名称生成的</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 18.png)</p>
+<p>在控制台中使用<code>generateWordKey</code>函数生成token</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 19.png)</p>
+<p>发包进行测试，可以获取数据</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 20.png)</p>
+<p>做到这里其实并不需要，完全把token的生成算法全部逆向出来，知道大概的流程就可以。</p>
+<p>可以通过<code>generatetoken.js</code> 去生成token，在wego中使用execjs库去执行js代码生成token</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">def</span><br><span class="line"><span class="title function_">getToken</span>(self)</span><br><span class="line">:</span><br><span class="line"><span class="keyword">with</span> <span class="title function_">open</span>(<span class="string">&#x27;../../../utils/data/generatetoken.js&#x27;</span>, <span class="string">&#x27;r&#x27;</span>) <span class="keyword">as</span></span><br><span class="line"><span class="attr">f</span>:</span><br><span class="line">    js = f.<span class="title function_">read</span>()</span><br><span class="line">ctx = <span class="title function_">compile</span>(js)</span><br><span class="line">token = ctx.<span class="title function_">call</span>(<span class="string">&#x27;generateWordKey&#x27;</span>, self.<span class="property">kw</span>)</span><br><span class="line"><span class="keyword">return</span> token</span><br></pre></td></tr></table></figure>
+
+<p>成功解决bug获取到icp数据，好耶</p>
+<p>![Untitled](..&#x2F;imgs&#x2F;JS%20Debug%2013be7c086b3080b395e3f8c62af5dd34&#x2F;Untitled 21.png)</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">var _0x1b9ebc = new Pages(_0x25521d[&#x27;gQcZW&#x27;]);</span><br><span class="line">    var _0xe89c07 = generateWordKey(pageKw);</span><br><span class="line">    var _0x410bc0 = generateHostMD5Key(_0xe89c07, enkey);</span><br><span class="line">    var _0x73188a = getRandomNum(_0xe89c07);</span><br><span class="line">    $[&#x27;ajax&#x27;](&#123;</span><br><span class="line">        &#x27;type&#x27;: _0x25521d[_0x34da(&#x27;‫9b&#x27;, &#x27;wjKk&#x27;)],</span><br><span class="line">        &#x27;url&#x27;: _0x25521d[_0x34da(&#x27;‫9c&#x27;, &#x27;K)OH&#x27;)],</span><br><span class="line">        &#x27;beforeSend&#x27;: function() &#123;</span><br><span class="line">            _0x25521d[_0x34da(&#x27;‫9d&#x27;, &#x27;Ioe9&#x27;)]($, &#x27;#result_table&#x27;)[_0x34da(&#x27;‮9e&#x27;, &#x27;wjKk&#x27;)](_0x25521d[_0x34da(&#x27;‫9f&#x27;, &#x27;kjeK&#x27;)]);</span><br><span class="line">        &#125;,</span><br><span class="line">        &#x27;data&#x27;: &#123;</span><br><span class="line">            &#x27;pageNo&#x27;: currPage,</span><br><span class="line">            &#x27;pageSize&#x27;: pageSize,</span><br><span class="line">            &#x27;Kw&#x27;: pageKw,</span><br><span class="line">            &#x27;enKey&#x27;: enkey,</span><br><span class="line">            &#x27;randomNum&#x27;: _0x73188a,</span><br><span class="line">            &#x27;token&#x27;: _0x410bc0</span><br><span class="line">        &#125;,</span><br></pre></td></tr></table></figure>
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="https://github.com/intbjw">项目</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-Bug%E5%A4%8D%E7%8E%B0"><span class="toc-number">1.</span> <span class="toc-text">1. Bug复现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E7%86%9F%E6%82%89Sources"><span class="toc-number">2.</span> <span class="toc-text">2. 熟悉Sources</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%BD%BF%E7%94%A8%E6%96%AD%E7%82%B9%E6%9A%82%E5%81%9C%E4%BB%A3%E7%A0%81"><span class="toc-number">3.</span> <span class="toc-text">3. 使用断点暂停代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E9%80%90%E6%AD%A5%E8%B0%83%E8%AF%95%E4%BB%A3%E7%A0%81"><span class="toc-number">4.</span> <span class="toc-text">4. 逐步调试代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E8%AE%BE%E7%BD%AE%E4%BB%A3%E7%A0%81%E8%A1%8C%E6%96%AD%E7%82%B9"><span class="toc-number">5.</span> <span class="toc-text">5. 设置代码行断点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E6%A3%80%E6%9F%A5%E5%8F%98%E9%87%8F%E5%80%BC"><span class="toc-number">6.</span> <span class="toc-text">6. 检查变量值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E4%B8%80%EF%BC%9A%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%9D%A2%E6%9D%BF"><span class="toc-number">6.1.</span> <span class="toc-text">方法一：作用域面板</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%EF%BC%9Achinaz-com"><span class="toc-number">7.</span> <span class="toc-text">案例：chinaz.com</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://intbjw.github.io/2022/08/17/JS%20Debug/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&text=JS Debug"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&title=JS Debug"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&is_video=false&description=JS Debug"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=JS Debug&body=Check out this article: https://intbjw.github.io/2022/08/17/JS%20Debug/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&title=JS Debug"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&title=JS Debug"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&title=JS Debug"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&title=JS Debug"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://intbjw.github.io/2022/08/17/JS%20Debug/&name=JS Debug&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://intbjw.github.io/2022/08/17/JS%20Debug/&t=JS Debug"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2020-2025
+    intBJW
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="https://github.com/intbjw">项目</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+  <script type="text/javascript">
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?0ae94ec1b308edd27e5393ae9c49cd4e";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+        </script>
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'intbjw/intbjw.github.io';
+      var utterances_issue_term = 'pathname';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-dark';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+</body>
+</html>
